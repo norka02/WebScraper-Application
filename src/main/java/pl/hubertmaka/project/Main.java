@@ -30,7 +30,12 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        runApp(args);
+    }
+
+    public static void runApp(String[] args) {
+        logger.info("Launching app.");
         launch(args);
-        logger.info("");
+
     }
 }
