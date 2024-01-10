@@ -1,8 +1,12 @@
 module pl.hubertmaka.webscraper {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics;
 
+    // Eksportowanie pakietów
+    exports pl.hubertmaka.project to javafx.graphics;
+    exports pl.hubertmaka.project.ui to javafx.fxml;
 
-    opens pl.hubertmaka.webscraper to javafx.fxml;
-    exports pl.hubertmaka.webscraper;
+    // Otwieranie pakietu dla dostępu przez FXMLLoader
+    opens pl.hubertmaka.project.ui to javafx.fxml;
 }

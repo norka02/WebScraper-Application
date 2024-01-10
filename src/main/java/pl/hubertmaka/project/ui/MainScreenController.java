@@ -1,9 +1,9 @@
-package pl.hubertmaka.webscraper;
+package pl.hubertmaka.project.ui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class Controller {
+public class MainScreenController {
     private int count = 0;
     @FXML
     private Label labelText;
