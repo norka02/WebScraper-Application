@@ -31,7 +31,8 @@ public class ParserOlx extends ScraperOlx {
 
             for (Elements listItems : elementsArrayList) {
                 for (Element listItem : listItems) {
-                    System.out.println(listItem.text());
+                    Element title = listItem.selectFirst("h6.css-16v5mdi.er34gjf0");
+                    System.out.println(title.text());
 
                     counter++;
                 }

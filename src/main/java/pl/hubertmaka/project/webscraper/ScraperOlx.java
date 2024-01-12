@@ -62,7 +62,7 @@ public class ScraperOlx {
     }
 
     private Elements getItemsList(Document document) {
-        return document.select("div.css-1sw7q4x");
+        return document.select("div.css-oukcj3 div.css-qfzx1y");
     }
 
     private String buildUrlOnlyCity(int page) {

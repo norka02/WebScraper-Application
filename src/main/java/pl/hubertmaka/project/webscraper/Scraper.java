@@ -78,6 +78,19 @@ public class Scraper {
         return elementsArrayList;
     };
 
+    private Elements scrapSite(int page) throws IOException {
+        String url = buildUrl(page);
+        logger.info("Building url nr: " + page);
+        Connection connection = this.connectToSite(url);
+        logger.info("Connecting to site nr: " + page);
+        Document document = this.getDocument(connection);
+        logger.info("Getting document nr:" + page);
+        Elements itemsList = this.getItemsList(document);
+        logger.info("Getting elements nr: " + page);
+
+        return itemsList;
+    }
+
     private String buildUrl(int page) {
         StringBuilder url = new StringBuilder();
         url.append(coreUrl)
@@ -107,18 +120,7 @@ public class Scraper {
         ); // lub data-cy="listing-item"
     }
 
-    private Elements scrapSite(int page) throws IOException {
-        String url = buildUrl(page);
-        logger.info("Building url nr: " + page);
-        Connection connection = this.connectToSite(url);
-        logger.info("Connecting to site nr: " + page);
-        Document document = this.getDocument(connection);
-        logger.info("Getting document nr:" + page);
-        Elements itemsList = this.getItemsList(document);
-        logger.info("Getting elements nr: " + page);
 
-        return itemsList;
-    }
 
 
 }
