@@ -12,51 +12,111 @@ import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class Scraper {
     private static final Logger logger = LogManager.getLogger(Scraper.class);
 
-    public static void main(String[] args) {
-        PropertyType propertyType = PropertyType.APARTMENTS;
-        PurchaseType purchaseType= PurchaseType.FOR_SALE;
-        CityType cityType = CityType.KRAKOW;
-        VoivodeshipType voivodeshipType = VoivodeshipType.LESSER_POLAND;
-        Limit limit = Limit.LIMIT_32;
+    private final String coreUrl = "https://www.otodom.pl/pl/wyniki/";
+    private final PropertyType propertyType;
+    private final PurchaseType purchaseType;
+    private final CityType cityType;
+    private final VoivodeshipType voivodeshipType;
+    private final Limit limit;
 
-        StringBuilder url = new StringBuilder();
-        url.append("https://www.otodom.pl/pl/wyniki/")
-                .append(purchaseType.getPolishName()).append("/")
-                .append(propertyType.getPolishName()).append("/")
-                .append(voivodeshipType.getPolishName()).append("/")
-                .append(cityType.getPolishName())
-                .append("?limit=72");
-        try {
-            Connection connect = Jsoup.connect(url.toString());
-            Document document = connect.get();
+    public Scraper(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType, Limit limit) {
+        this.propertyType = propertyType;
+        this.purchaseType = purchaseType;
+        this.cityType = cityType;
+        this.voivodeshipType = voivodeshipType;
+        this.limit = limit;
+    }
 
-            Elements listItems = document.select("[data-cy=search.listing.organic] ul.css-rqwdxd.e1tno8ef0 li.css-o9b79t.e1dfeild0"); // lub data-cy="listing-item"
-            int counter = 0;
-            for (Element listItem: listItems) {
-                Element aElement = listItem.selectFirst("a");
-                if (aElement != null) {
-                    System.out.println(aElement.attr("href"));
+    public ArrayList<Elements> getAllElementsFromSite() throws IOException {
+        int page = 1;
+        ArrayList<Elements> elementsArrayList = new ArrayList<>();
+        while (true) {
+            Elements itemsList = scrapSite(page);
 
-                }
-                counter++;
-
+            if (itemsList.isEmpty()) {
+                logger.info("No more elements.");
+                break;
             }
-            System.out.println(counter);
-//            Elements images = document.select("img");
-//
-//            for (Element img: images) {
-//                System.out.println(img.absUrl("src"));
-//                counter++;
-//            }
-//            System.out.println(counter);
-        } catch (IOException e) {
-            logger.warn(e.toString());
-        }
 
+            elementsArrayList.add(itemsList);
+            logger.info("Adding elements to ArrayList nr:" + page);
+
+            page++;
+        }
+        return elementsArrayList;
+    };
+
+
+    public ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException {
+        int page = 1;
+        ArrayList<Elements> elementsArrayList = new ArrayList<>();
+
+        while (true) {
+            Elements itemsList = scrapSite(page);
+
+            if (itemsList.isEmpty()) {
+                logger.info("No more elements.");
+                break;
+            }
+
+            elementsArrayList.add(itemsList);
+
+            if (page == max_pages) {
+                break;
+            }
+
+            logger.info("Adding elements to ArrayList nr:" + page);
+
+            page++;
+        }
+        return elementsArrayList;
+    };
+
+    private String buildUrl(int page) {
+        StringBuilder url = new StringBuilder();
+        url.append(coreUrl)
+                .append(this.purchaseType.getPolishName()).append("/")
+                .append(this.propertyType.getPolishName()).append("/")
+                .append(this.voivodeshipType.getPolishName()).append("/")
+                .append(this.cityType.getPolishName())
+                .append("?limit=").append(this.limit.getLimit())
+                .append("&page=").append(page);
+        return url.toString();
+    }
+
+    private Connection connectToSite(String url) {
+        return Jsoup.connect(url);
+    }
+
+    private Document getDocument(Connection connection) throws IOException {
+        return connection.get();
+    }
+
+    private Elements getItemsList(Document document) {
+        return document.select(
+                "[data-cy=search.listing.organic] " +
+                        "ul.css-rqwdxd.e1tno8ef0 " +
+                        "li.css-o9b79t.e1dfeild0 " +
+                        "[data-cy=listing-item-link]"
+        ); // lub data-cy="listing-item"
+    }
+
+    private Elements scrapSite(int page) throws IOException {
+        String url = buildUrl(page);
+        logger.info("Building url nr: " + page);
+        Connection connection = this.connectToSite(url);
+        logger.info("Connecting to site nr: " + page);
+        Document document = this.getDocument(connection);
+        logger.info("Getting document nr:" + page);
+        Elements itemsList = this.getItemsList(document);
+        logger.info("Getting elements nr: " + page);
+
+        return itemsList;
     }
 }
