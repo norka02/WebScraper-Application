@@ -3,6 +3,7 @@ package pl.hubertmaka.project.enums;
 import pl.hubertmaka.project.interfaces.Type;
 
 public enum PropertyType implements Type {
+    APARTMENTS_OLX("mieszkania"),
     APARTMENTS("mieszkanie"),
     STUDIOS("kawalerka"),
     HOUSES("dom"),

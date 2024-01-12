@@ -14,11 +14,11 @@ import java.util.ArrayList;
 
 public class ScraperOlx {
     private static final Logger logger = LogManager.getLogger(ScraperOlx.class);
-    private final String coreUrl = "https://www.olx.pl/nieruchomosci/mieszkania/";
+    private final String coreUrl = "https://www.olx.pl/nieruchomosci/";
     private final PropertyType propertyType;
     private final PurchaseType purchaseType;
-    private CityType cityType = CityType.valueOf("");
-    private VoivodeshipType voivodeshipType = VoivodeshipType.valueOf("");
+    private final CityType cityType;
+    private final VoivodeshipType voivodeshipType;
 
     // Do scrapwoania poszczególnych miast
     public ScraperOlx(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType) {
@@ -62,36 +62,40 @@ public class ScraperOlx {
     }
 
     private Elements getItemsList(Document document) {
-        return document.select("");
+        return document.select("div.css-1sw7q4x");
     }
 
     private String buildUrlOnlyCity(int page) {
         StringBuilder url = new StringBuilder();
         url.append(coreUrl)
-                .append(this.purchaseType.getPolishName()).append("/")
                 .append(this.propertyType.getPolishName()).append("/")
-                .append(this.cityType.getPolishName())
-                .append("&page=").append(page);
+                .append(this.purchaseType.getPolishName()).append("/")
+                .append(this.cityType.getPolishName()).append("/")
+                .append("?page=").append(page);
         return url.toString();
     }
 
     private String buildUrlAllVoivodeship(int page) {
         StringBuilder url = new StringBuilder();
         url.append(coreUrl)
-                .append(this.purchaseType.getPolishName()).append("/")
                 .append(this.propertyType.getPolishName()).append("/")
+                .append(this.purchaseType.getPolishName()).append("/")
                 .append(this.voivodeshipType.getPolishName()).append("/")
-                .append("&page=").append(page);
+                .append("?page=").append(page);
         return url.toString();
     }
+
 
     private Elements scrapSite(int page, boolean scrapOnlyCity) throws IOException {
         String url;
         if (scrapOnlyCity) {
             url = buildUrlOnlyCity(page);
+            logger.info("Choosing scraping only cities");
         } else {
             url = buildUrlAllVoivodeship(page);
+            logger.info("Choosing scraping voivodeships");
         }
+
         logger.info("Building url nr: " + page);
         Connection connection = this.connectToSite(url);
         logger.info("Connecting to site nr: " + page);
