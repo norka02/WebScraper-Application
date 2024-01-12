@@ -119,4 +119,6 @@ public class Scraper {
 
         return itemsList;
     }
+
+
 }
