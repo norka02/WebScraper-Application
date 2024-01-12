@@ -32,8 +32,18 @@ public class ParserOlx extends ScraperOlx {
             for (Elements listItems : elementsArrayList) {
                 for (Element listItem : listItems) {
                     Element title = listItem.selectFirst("h6.css-16v5mdi.er34gjf0");
-                    System.out.println(title.text());
-
+                    if (title != null) {
+                        System.out.println(title.text());
+                    }
+                    Element price = listItem.selectFirst("p.css-10b0gli.er34gjf0");
+                    if (price != null) {
+                        System.out.println(price.text());
+                    }
+                    Element location = listItem.selectFirst("p.css-veheph");
+                    if (location != null) {
+                        System.out.println(location.text());
+                    }
+                    System.out.println("\n-------------------------------------------");
                     counter++;
                 }
             }
