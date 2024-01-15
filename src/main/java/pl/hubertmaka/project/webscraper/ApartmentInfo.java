@@ -9,12 +9,49 @@ public class ApartmentInfo {
     private String linkToAnnouncement = null;
     private boolean isBoosted = false;
     private String title = null;
-    private String location = null;
-    private String price = null;
-    private String pricePerMeter = null;
-    private String rooms = null;
-    private String size = null;
+    private String voivodeship = null;
+    private String city = null;
+    private String district = null;
+    private String street = null;
+    private Integer price = null;
+    private Integer pricePerMeter = null;
+    private Integer rooms = null;
+    private Double size = null;
     private String additionalInfo = null;
+
+    public String getVoivodeship() {
+        return voivodeship;
+    }
+
+    public void setVoivodeship(String voivodeship) {
+        this.voivodeship = voivodeship;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+
 
     public String getAdditionalInfo() {
         return additionalInfo;
@@ -56,55 +93,50 @@ public class ApartmentInfo {
         this.title = title;
     }
 
-    public String getLocation() {
-        return location;
-    }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
-    public String getPricePerMeter() {
+    public Integer getPricePerMeter() {
         return pricePerMeter;
     }
 
-    public void setPricePerMeter(String pricePerMeter) {
+    public void setPricePerMeter(Integer pricePerMeter) {
         this.pricePerMeter = pricePerMeter;
     }
 
-    public String getRooms() {
+    public Integer getRooms() {
         return rooms;
     }
 
-    public void setRooms(String rooms) {
+    public void setRooms(Integer rooms) {
         this.rooms = rooms;
     }
 
-    public String getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 
     public String getAllInfo() {
         StringBuilder info = new StringBuilder();
         return info.append(this.title).append("\n")
-                .append(this.location).append("\n")
+                .append(this.voivodeship).append("\n")
+                .append(this.city).append("\n")
+                .append(this.district).append("\n")
                 .append(this.isBoosted).append("\n")
-                .append(this.price).append("\n")
-                .append(this.pricePerMeter).append("\n")
-                .append(this.rooms).append("\n")
-                .append(this.size).append("\n")
+                .append(this.price.toString()).append("\n")
+                .append(this.pricePerMeter.toString()).append("\n")
+                .append(this.rooms.toString()).append("\n")
+                .append(this.size.toString()).append("\n")
                 .append(this.imgSrc).append("\n")
                 .append(this.linkToAnnouncement).append("\n")
                 .append(this.additionalInfo).append("\n")

@@ -33,7 +33,7 @@ public class Scraper {
         this.limit = limit;
     }
 
-    public ArrayList<Elements> getAllElementsFromSite() throws IOException {
+    public ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
         while (true) {
@@ -53,7 +53,7 @@ public class Scraper {
     };
 
 
-    public ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException {
+    public ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
@@ -63,6 +63,7 @@ public class Scraper {
             if (itemsList.isEmpty()) {
                 logger.info("No more elements.");
                 break;
+
             }
 
             elementsArrayList.add(itemsList);

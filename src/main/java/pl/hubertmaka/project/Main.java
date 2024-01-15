@@ -24,6 +24,8 @@ public class Main extends Application {
             primaryStage.setTitle("My Web Scraper Application");
             primaryStage.setScene(new Scene(root));
             primaryStage.show();
+
+
         } catch(Exception e) {
             logger.error(e.toString(), new RuntimeException("App Exception"));
         }

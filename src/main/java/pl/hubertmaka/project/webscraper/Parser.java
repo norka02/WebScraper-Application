@@ -20,11 +20,14 @@ public class Parser extends Scraper {
         logger.info("Filling ApartmentInfo instance.");
 
         apartmentInfoInstance.setTitle(getTitleText(listItem));
-        apartmentInfoInstance.setLocation(getLocationText(listItem));
-        apartmentInfoInstance.setPrice(getApartmentInfos(listItem).get("price"));
-        apartmentInfoInstance.setPricePerMeter(getApartmentInfos(listItem).get("pricePerMeter"));
-        apartmentInfoInstance.setRooms(getApartmentInfos(listItem).get("rooms"));
-        apartmentInfoInstance.setSize(getApartmentInfos(listItem).get("size"));
+        apartmentInfoInstance.setVoivodeship(extractLocationDetails(listItem).get("voivodeship"));
+        apartmentInfoInstance.setCity(extractLocationDetails(listItem).get("city"));
+        apartmentInfoInstance.setDistrict(extractLocationDetails(listItem).get("district"));
+        apartmentInfoInstance.setStreet(extractLocationDetails(listItem).get("street"));
+        apartmentInfoInstance.setPrice(parsePrice(getApartmentInfos(listItem)));
+        apartmentInfoInstance.setPricePerMeter(parsePricePerMeter(getApartmentInfos(listItem)));
+        apartmentInfoInstance.setRooms(parseRooms(getApartmentInfos(listItem)));
+        apartmentInfoInstance.setSize(parseSize(getApartmentInfos(listItem)));
         apartmentInfoInstance.setImgSrc(getImgElementText(listItem));
         apartmentInfoInstance.setLinkToAnnouncement(getAElementHref(listItem));
         apartmentInfoInstance.setBoosted(getIsBoostedStatus(listItem));
@@ -42,7 +45,7 @@ public class Parser extends Scraper {
                     PurchaseType.FOR_SALE,
                     CityType.KRAKOW,
                     VoivodeshipType.LESSER_POLAND,
-                    Limit.LIMIT_72
+                    Limit.LIMIT_24
             );
 
             ArrayList<Elements> elementsArrayList = parser.getAllElementsFromSite(1);
@@ -67,6 +70,8 @@ public class Parser extends Scraper {
         } catch (IOException e) {
             logger.error(e.toString());
             throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -83,7 +88,7 @@ public class Parser extends Scraper {
     private String getAElementHref(Element listItem) {
         Element aElement = listItem.selectFirst("a");
         if (aElement != null) {
-            return aElement.attr("href");
+            return "https://www.otodom.pl" + aElement.attr("href");
         }
         logger.warn("Empty element.");
         return "";
@@ -116,20 +121,72 @@ public class Parser extends Scraper {
         return "";
     }
 
+    private HashMap<String, String> extractLocationDetails(Element listItem) {
+        String summaryLocation = getLocationText(listItem).toUpperCase();
+        String[] summaryLocationArray = summaryLocation.split(", ");
+        return mapLocations(summaryLocationArray);
+    }
+
+    private HashMap<String, String> mapLocations(String[] summaryLocationArray) {
+        String[] possibleLocations = {"voivodeship", "city", "district", "street"};
+        HashMap<String, String> extractedLocations = new HashMap<>();
+
+        for (int i = 0; i < possibleLocations.length - 1; i++) {
+            extractedLocations.put(possibleLocations[i], summaryLocationArray[summaryLocationArray.length - (i + 1)]);
+        }
+
+        // This loop can be used length - 2 times beacuse the street parameter from the scraped site is the fires arg
+        extractedLocations.put(possibleLocations[possibleLocations.length - 1], summaryLocationArray[0]);
+        return extractedLocations;
+    }
+
     private HashMap<String, String> getApartmentInfos(Element listItem) {
         Elements apartmentInfos = listItem.select("span.css-1cyxwvy.ei6hyam2");
-
         HashMap<String, String> apartmentInfosHashMap = new HashMap<>();
         String[] labels = {"price", "pricePerMeter", "rooms", "size"};
 
-        int counter = 0;
-        for (Element apartmentInfo : apartmentInfos) {
-            if (counter < labels.length) {
-                apartmentInfosHashMap.put(labels[counter], apartmentInfo.text());
-            }
-            counter++;
+        for (int i = 0; i < labels.length
+                ; i++) {
+            String textValue = apartmentInfos.get(i).text().replaceAll("[^\\d,]", "").replace(",", ".");
+            apartmentInfosHashMap.put(labels[i], textValue);
         }
         return apartmentInfosHashMap;
+    }
+
+    private Integer  parsePrice(HashMap<String, String> apartmentInfosHashMap) {
+        try {
+            String priceString = apartmentInfosHashMap.get("price");
+            return Integer.parseInt(priceString);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private Integer  parsePricePerMeter(HashMap<String, String> apartmentInfosHashMap) {
+        try {
+            String pricePerMeter = apartmentInfosHashMap.get("pricePerMeter");
+            return Integer.parseInt(pricePerMeter);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private Integer parseRooms(HashMap<String, String> apartmentInfosHashMap) {
+        try {
+            String roomsString = apartmentInfosHashMap.get("rooms");
+            return Integer.parseInt(roomsString);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private Double parseSize(HashMap<String, String> apartmentInfosHashMap) {
+        try {
+            String sizeString = apartmentInfosHashMap.get("size");
+            return Double.parseDouble(sizeString);
+        } catch (NumberFormatException e) {
+            return -1.0;
+        }
     }
 
     private String getAdditionalInfo(Element listItem) {
