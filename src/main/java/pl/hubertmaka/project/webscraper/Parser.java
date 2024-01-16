@@ -19,6 +19,7 @@ public class Parser extends Scraper {
     public ApartmentInfo fillApartmentInfo(ApartmentInfo apartmentInfoInstance, Element listItem) {
         logger.info("Filling ApartmentInfo instance.");
 
+        apartmentInfoInstance.setFromSite("OTODOM");
         apartmentInfoInstance.setTitle(getTitleText(listItem));
         apartmentInfoInstance.setVoivodeship(extractLocationDetails(listItem).get("voivodeship"));
         apartmentInfoInstance.setCity(extractLocationDetails(listItem).get("city"));
@@ -37,46 +38,8 @@ public class Parser extends Scraper {
     }
 
 
-    public static void main(String[] args) {
-        try {
-            // TODO: create builder design pattern
-            Parser parser = new Parser(
-                    PropertyType.APARTMENTS,
-                    PurchaseType.FOR_SALE,
-                    CityType.KRAKOW,
-                    VoivodeshipType.LESSER_POLAND,
-                    Limit.LIMIT_24
-            );
 
-            ArrayList<Elements> elementsArrayList = parser.getAllElementsFromSite(1);
-
-            ArrayList<ApartmentInfo> apartmentInfoArrayList = new ArrayList<>();
-            int counter = 0;
-
-            for (Elements listItems : elementsArrayList) {
-                for (Element listItem : listItems) {
-                    ApartmentInfo apartmentInfo = parser.fillApartmentInfo(
-                            new ApartmentInfo(), listItem
-                    );
-                    System.out.println("---------------------------------------------------------\n");
-                    System.out.println(apartmentInfo.getAllInfo());
-                    System.out.println("---------------------------------------------------------\n");
-                    apartmentInfoArrayList.add(apartmentInfo);
-
-                    counter++;
-                }
-            }
-            System.out.println(counter);
-        } catch (IOException e) {
-            logger.error(e.toString());
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-        private String getImgElementText(Element listItem) {
+    private String getImgElementText(Element listItem) {
         Element imgElement = listItem.selectFirst("img");
         if (imgElement != null) {
             return imgElement.attr("src");
@@ -162,12 +125,12 @@ public class Parser extends Scraper {
         }
     }
 
-    private Integer  parsePricePerMeter(HashMap<String, String> apartmentInfosHashMap) {
+    private Double parsePricePerMeter(HashMap<String, String> apartmentInfosHashMap) {
         try {
             String pricePerMeter = apartmentInfosHashMap.get("pricePerMeter");
-            return Integer.parseInt(pricePerMeter);
+            return Double.parseDouble(pricePerMeter);
         } catch (NumberFormatException e) {
-            return -1;
+            return -1.0;
         }
     }
 

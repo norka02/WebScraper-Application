@@ -25,6 +25,26 @@ public class Scraper {
     private final VoivodeshipType voivodeshipType;
     private final Limit limit;
 
+    public PropertyType getPropertyType() {
+        return propertyType;
+    }
+
+    public PurchaseType getPurchaseType() {
+        return purchaseType;
+    }
+
+    public CityType getCityType() {
+        return cityType;
+    }
+
+    public VoivodeshipType getVoivodeshipType() {
+        return voivodeshipType;
+    }
+
+    public Limit getLimit() {
+        return limit;
+    }
+
     public Scraper(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType, Limit limit) {
         this.propertyType = propertyType;
         this.purchaseType = purchaseType;
@@ -33,7 +53,7 @@ public class Scraper {
         this.limit = limit;
     }
 
-    public ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
+    protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
         while (true) {
@@ -53,7 +73,7 @@ public class Scraper {
     };
 
 
-    public ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
+    protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 

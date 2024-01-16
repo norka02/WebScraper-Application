@@ -17,6 +17,23 @@ public class ScraperOlx {
     private final String coreUrl = "https://www.olx.pl/nieruchomosci/";
     private final PropertyType propertyType;
     private final PurchaseType purchaseType;
+
+    public PropertyType getPropertyType() {
+        return propertyType;
+    }
+
+    public PurchaseType getPurchaseType() {
+        return purchaseType;
+    }
+
+    public CityType getCityType() {
+        return cityType;
+    }
+
+    public VoivodeshipType getVoivodeshipType() {
+        return voivodeshipType;
+    }
+
     private final CityType cityType;
     private final VoivodeshipType voivodeshipType;
 
@@ -28,7 +45,7 @@ public class ScraperOlx {
         this.voivodeshipType = voivodeshipType;
     }
 
-    public ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException {
+    protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
@@ -53,6 +70,27 @@ public class ScraperOlx {
         return elementsArrayList;
     };
 
+    protected ArrayList<Elements> getAllElementsFromSite() throws IOException {
+        int page = 1;
+        ArrayList<Elements> elementsArrayList = new ArrayList<>();
+
+        while (true) {
+            Elements itemsList = scrapSite(page, true);
+
+            if (itemsList.isEmpty()) {
+                logger.info("No more elements.");
+                break;
+            }
+
+            elementsArrayList.add(itemsList);
+
+            logger.info("Adding elements to ArrayList nr:" + page);
+
+            page++;
+        }
+        return elementsArrayList;
+    };
+
     private Connection connectToSite(String url) {
         return Jsoup.connect(url);
     }
@@ -62,7 +100,7 @@ public class ScraperOlx {
     }
 
     private Elements getItemsList(Document document) {
-        return document.select("div.css-oukcj3 div.css-qfzx1y");
+        return document.select("div.css-oukcj3 div.css-1sw7q4x");
     }
 
     private String buildUrlOnlyCity(int page) {

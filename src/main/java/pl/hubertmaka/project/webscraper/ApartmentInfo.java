@@ -5,19 +5,29 @@ import org.apache.logging.log4j.Logger;
 
 public class ApartmentInfo {
     private final static Logger logger = LogManager.getLogger(ApartmentInfo.class);
-    private String imgSrc = null;
+    private String fromSite = null;
+
+    public String getFromSite() {
+        return fromSite;
+    }
+
+    public void setFromSite(String fromSite) {
+        this.fromSite = fromSite;
+    }
+
+    private String imgSrc = "None";
     private String linkToAnnouncement = null;
     private boolean isBoosted = false;
     private String title = null;
-    private String voivodeship = null;
+    private String voivodeship = "";
     private String city = null;
-    private String district = null;
+    private String district = "";
     private String street = null;
     private Integer price = null;
-    private Integer pricePerMeter = null;
-    private Integer rooms = null;
+    private Double pricePerMeter = 0.0;
+    private Integer rooms = 0;
     private Double size = null;
-    private String additionalInfo = null;
+    private String additionalInfo = "No additional info";
 
     public String getVoivodeship() {
         return voivodeship;
@@ -102,11 +112,11 @@ public class ApartmentInfo {
         this.price = price;
     }
 
-    public Integer getPricePerMeter() {
+    public Double getPricePerMeter() {
         return pricePerMeter;
     }
 
-    public void setPricePerMeter(Integer pricePerMeter) {
+    public void setPricePerMeter(Double pricePerMeter) {
         this.pricePerMeter = pricePerMeter;
     }
 
@@ -128,18 +138,19 @@ public class ApartmentInfo {
 
     public String getAllInfo() {
         StringBuilder info = new StringBuilder();
-        return info.append(this.title).append("\n")
-                .append(this.voivodeship).append("\n")
-                .append(this.city).append("\n")
-                .append(this.district).append("\n")
-                .append(this.isBoosted).append("\n")
-                .append(this.price.toString()).append("\n")
-                .append(this.pricePerMeter.toString()).append("\n")
-                .append(this.rooms.toString()).append("\n")
-                .append(this.size.toString()).append("\n")
-                .append(this.imgSrc).append("\n")
-                .append(this.linkToAnnouncement).append("\n")
-                .append(this.additionalInfo).append("\n")
+        return info.append("From site: ").append(this.fromSite).append("\n")
+                .append("Title: ").append(this.title).append("\n")
+                .append("Voivodeship: ").append(this.voivodeship).append("\n")
+                .append("City: ").append(this.city).append("\n")
+                .append("District: ").append(this.district).append("\n")
+                .append("Is boosted: ").append(this.isBoosted).append("\n")
+                .append("Price: ").append(this.price.toString()).append(" zł").append("\n")
+                .append("Price per meter: ").append(this.pricePerMeter.toString()).append(" zł/m²").append("\n")
+                .append("Rooms: ").append(this.rooms.toString()).append("\n")
+                .append("Apartment Size: ").append(this.size.toString()).append(" m²").append("\n")
+                .append("Image src: ").append(this.imgSrc).append("\n")
+                .append("Link to ann: ").append(this.linkToAnnouncement).append("\n")
+                .append("Additional info: ").append(this.additionalInfo).append("\n")
                 .toString();
     }
 }
