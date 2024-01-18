@@ -15,6 +15,16 @@ public class ApartmentInfo {
         this.fromSite = fromSite;
     }
 
+    private String purchaseType = "";
+
+    public String getPurchaseType() {
+        return purchaseType;
+    }
+
+    public void setPurchaseType(String purchaseType) {
+        this.purchaseType = purchaseType;
+    }
+
     private String imgSrc = "None";
     private String linkToAnnouncement = null;
     private boolean isBoosted = false;

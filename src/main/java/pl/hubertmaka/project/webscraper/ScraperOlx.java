@@ -53,7 +53,7 @@ public class ScraperOlx {
         this.voivodeshipType = voivodeshipType;
     }
 
-    protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException {
+    protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
@@ -81,7 +81,7 @@ public class ScraperOlx {
         return elementsArrayList;
     };
 
-    protected ArrayList<Elements> getAllElementsFromSite() throws IOException {
+    protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
@@ -105,7 +105,11 @@ public class ScraperOlx {
         return elementsArrayList;
     };
 
-    private Connection connectToSite(String url) {
+    private Connection connectToSite(String url) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            logger.info("Scraping interrupted, exiting connectToSite");
+            throw new InterruptedException("Scraping interrupted during connectToSite");
+        }
         return Jsoup.connect(url);
     }
 
@@ -138,7 +142,7 @@ public class ScraperOlx {
     }
 
 
-    private Elements scrapSite(int page, boolean scrapOnlyCity) throws IOException {
+    private Elements scrapSite(int page, boolean scrapOnlyCity) throws IOException, InterruptedException {
         String url;
         if (scrapOnlyCity) {
             url = buildUrlOnlyCity(page);

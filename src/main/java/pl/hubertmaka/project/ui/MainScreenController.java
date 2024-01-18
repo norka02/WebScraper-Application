@@ -25,8 +25,10 @@ import javafx.concurrent.Task;
 
 public class MainScreenController {
     private static final Logger logger = LogManager.getLogger(MainScreenController.class);
+
     private Task<Void> loadDataTask;
     private final Map<String, List<String>> voivodeshipToCities = new HashMap<>();
+    private final Map<String, List<String>> normalizedVoivodeshipToCities = new HashMap<>();
     private final ObservableList<ApartmentInfo> apartmentList = FXCollections.observableArrayList();
     public final ScraperApi scraperApi = new ScraperApi();
 
@@ -36,8 +38,8 @@ public class MainScreenController {
         voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy", "Świdnik", "Kraśnik", "Lubartów"));
         voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań", "Świebodzin", "Międzyrzecz", "Kostrzyn nad Odrą"));
         voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów", "Zgierz", "Skierniewice", "Radomsko"));
-        voivodeshipToCities.put("malopolskie", Arrays.asList("krakow", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów", "Olkusz", "Nowy Targ", "Bochnia"));
-        voivodeshipToCities.put("mazowieckie", Arrays.asList("warszawa", "Radom", "Płock", "Siedlce", "Pruszków", "Ostrołęka", "Legionowo", "Ciechanów"));
+        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów", "Olkusz", "Nowy Targ", "Bochnia"));
+        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków", "Ostrołęka", "Legionowo", "Ciechanów"));
         voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork", "Prudnik", "Strzelce Opolskie", "Głubczyce"));
         voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg", "Krosno", "Sanok", "Jasło"));
         voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski", "Zambrów", "Hajnówka", "Siemiatycze"));
@@ -48,6 +50,8 @@ public class MainScreenController {
         voivodeshipToCities.put("Wielkopolskie", Arrays.asList("Poznań", "Kalisz", "Konin", "Piła", "Ostrów Wielkopolski", "Gniezno", "Leszno", "Śrem"));
         voivodeshipToCities.put("Zachodniopomorskie", Arrays.asList("Szczecin", "Koszalin", "Stargard", "Kołobrzeg", "Świnoujście", "Szczecinek", "Wałcz", "Białogard"));
     }
+    @FXML
+    public Label infoLabel;
     @FXML
     private CheckComboBox<String> voivodeshipCheckComboBox;
     @FXML
@@ -68,6 +72,13 @@ public class MainScreenController {
     @FXML
     private ComboBox<String> sortByComboBox;
 
+    @FXML
+    private RadioButton forSaleRadioButton;
+    @FXML
+    private RadioButton forRentRadioButton;
+    @FXML
+    private ToggleGroup purchaseTypeGroup;
+
 
 
 
@@ -79,6 +90,7 @@ public class MainScreenController {
         initializeVoivodeshipCheckComboBox();
         initializeCityCheckComboBox();
         initializeFilterAndSortComboBoxes();
+        normalizeVoivodeshipToCities();
         apartmentListView.setCellFactory(new Callback<ListView<ApartmentInfo>, ListCell<ApartmentInfo>>() {
             @Override
             public ListCell<ApartmentInfo> call(ListView<ApartmentInfo> listView) {
@@ -91,22 +103,33 @@ public class MainScreenController {
                         } else {
                             VBox vbox = new VBox(5); // wertykalny układ dla elementów
 
-
-                            Text fromSite = new Text("From Site: " + item.getFromSite());
                             Text title = new Text("Title: " + item.getTitle());
+                            Text fromSite = new Text("From Site: " + item.getFromSite());
                             Text voivodeship = new Text("Voivodeship: " + item.getVoivodeship());
                             Text city = new Text("City: " + item.getCity());
                             Text district = new Text("District: " + item.getDistrict());
                             Text street = new Text("Street: " + item.getStreet());
                             String priceInfo;
+                            String pricePerMeterInfo;
+                            String roomsInfo;
                             if (item.getPrice() < 0) {
                                 priceInfo = "Price: Not defined.";
                             } else {
                                priceInfo = "Price: " + item.getPrice().toString() + " zł";
                             }
+                            if (item.getPricePerMeter() < 0) {
+                                pricePerMeterInfo = "Price per meter: Not defined.";
+                            } else {
+                                pricePerMeterInfo = "Price per meter: " + item.getPrice().toString() + " zł/m²";
+                            }
+                            if (item.getRooms() <= 0) {
+                                roomsInfo = "Rooms: Not defined.";
+                            } else {
+                                roomsInfo = "Rooms: " + item.getRooms().toString();
+                            }
                             Text price = new Text(priceInfo);
-                            Text pricePerMeter = new Text("Price per meter: " + item.getPricePerMeter().toString() + " zł/m²");
-                            Text rooms = new Text("Rooms: " + item.getRooms().toString());
+                            Text pricePerMeter = new Text(pricePerMeterInfo);
+                            Text rooms = new Text(roomsInfo);
                             Text size = new Text("Size: " + item.getSize().toString() + " m²");
                             Text additionalInfo = new Text("Additional Info: " + item.getAdditionalInfo());
                             additionalInfo.setWrappingWidth(300);
@@ -130,6 +153,22 @@ public class MainScreenController {
             }
         });
 
+    }
+
+
+    private void normalizeVoivodeshipToCities() {
+        normalizedVoivodeshipToCities.clear();
+        for (Map.Entry<String, List<String>> entry : voivodeshipToCities.entrySet()) {
+            String normalizedKey = normalizeString(entry.getKey());
+            List<String> originalCities = entry.getValue();
+            List<String> normalizedCities = new ArrayList<>();
+
+            for (String city : originalCities) {
+                normalizedCities.add(normalizeString(city));
+            }
+
+            normalizedVoivodeshipToCities.put(normalizedKey, normalizedCities);
+        }
     }
 
     private void initializeFilterAndSortComboBoxes() {
@@ -227,6 +266,9 @@ public class MainScreenController {
 
     @FXML
     protected void handleLoadData() {
+
+        PurchaseType purchaseType = forSaleRadioButton.isSelected() ? PurchaseType.FOR_SALE : PurchaseType.ON_RENT;
+        infoLabel.setVisible(false);
         loadDataButton.setDisable(true);
         loadingLabel.setVisible(true);
         cancelLoadDataButton.setVisible(true);
@@ -259,24 +301,31 @@ public class MainScreenController {
                 System.out.println("Przekształcone województwa: " + selectedVoivodeships);
                 System.out.println("Przekształcone miasta: " + selectedCities);
 
-                scraperApi.createApartmentInfoArrayList(selectedCities, selectedVoivodeships, voivodeshipToCities);
+                scraperApi.createApartmentInfoArrayList(selectedCities, selectedVoivodeships, normalizedVoivodeshipToCities, purchaseType);
+
                 return null;
             }
         };
 
         loadDataTask.setOnSucceeded(e -> {
+            if (apartmentList.isEmpty()) {
+                infoLabel.setVisible(true);
+            }
             apartmentList.clear();
             apartmentList.addAll(scraperApi.apartmentInfoArrayList);
+            scraperApi.apartmentInfoArrayList.clear();
             loadingLabel.setVisible(false);
             apartmentListView.setItems(apartmentList);
             loadDataButton.setDisable(false);
             cancelLoadDataButton.setVisible(false);
+
 
             // Logowanie sukcesu
             System.out.println("Zadanie zakończone sukcesem. Dane załadowane.");
         });
 
         loadDataTask.setOnFailed(e -> {
+            scraperApi.apartmentInfoArrayList.clear();
             logger.error("Error during data loading: ", loadDataTask.getException());
             loadingLabel.setText("Error during data loading.");
 

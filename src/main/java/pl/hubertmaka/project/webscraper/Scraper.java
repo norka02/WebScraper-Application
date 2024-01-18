@@ -178,7 +178,10 @@ public class Scraper {
     }
 
     private Connection connectToSite(String url) throws InterruptedException {
-        Thread.sleep(1000);
+        if (Thread.currentThread().isInterrupted()) {
+            logger.info("Scraping interrupted, exiting connectToSite");
+            throw new InterruptedException("Scraping interrupted during connectToSite");
+        }
         return Jsoup.connect(url);
     }
 

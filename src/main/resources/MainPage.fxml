@@ -8,6 +8,7 @@
 <?import org.controlsfx.control.CheckComboBox?>
 
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.RadioButton?>
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="868.0" prefWidth="1282.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.hubertmaka.project.ui.MainScreenController">
 
     <!-- Lewy Panel z CheckComboBox i Przyciskami -->
@@ -20,8 +21,13 @@
             <ComboBox fx:id="filterByCityComboBox" />
             <ComboBox fx:id="filterByVoivodeshipComboBox"  />
             <ComboBox fx:id="sortByComboBox"  />
-
+            <children>
+                <Label text="Typ nieruchomości:"/>
+                <RadioButton fx:id="forSaleRadioButton" text="Na sprzedaż" selected="true" toggleGroup="$purchaseTypeGroup"/>
+                <RadioButton fx:id="forRentRadioButton" text="Na wynajem" toggleGroup="$purchaseTypeGroup"/>
+            </children>
             <Label fx:id="loadingLabel" style="-fx-text-fill: black; -fx-font-size: 16px;" text="Loading data... It can take some time depends on cities to get. You can go take some tea and when you will return it should be finished ;)" wrapText="true" />
+            <Label fx:id="infoLabel" style="-fx-text-fill: black; -fx-font-size: 16px;" text="You must to choose voivodeship and city first." wrapText="true" />
         </VBox>
     </left>
 
