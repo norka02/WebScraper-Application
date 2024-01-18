@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
 
@@ -25,14 +24,13 @@ public class Scraper {
     private final VoivodeshipType voivodeshipType;
     private final Limit limit;
 
-    private volatile boolean isScrapingCancelled = false;
 
-
-    public void cancelScraping() {
-        this.isScrapingCancelled = true;
-    }
-    public void startScraping() {
-        this.isScrapingCancelled = false;
+    public Scraper(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType, Limit limit) {
+        this.propertyType = propertyType;
+        this.purchaseType = purchaseType;
+        this.cityType = cityType;
+        this.voivodeshipType = voivodeshipType;
+        this.limit = limit;
     }
 
     public PropertyType getPropertyType() {
@@ -51,26 +49,11 @@ public class Scraper {
         return voivodeshipType;
     }
 
-    public Limit getLimit() {
-        return limit;
-    }
-
-    public Scraper(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType, Limit limit) {
-        this.propertyType = propertyType;
-        this.purchaseType = purchaseType;
-        this.cityType = cityType;
-        this.voivodeshipType = voivodeshipType;
-        this.limit = limit;
-    }
-
     protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
         int tries = 0;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
         while (true) {
-            if (isScrapingCancelled) {
-                break;
-            }
 
             if (tries >= 5) {
                 logger.info("No more elements");
@@ -102,9 +85,6 @@ public class Scraper {
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
-            if (isScrapingCancelled) {
-                break;
-            }
 
             if (tries >= 5) {
                 logger.info("No more elements");
@@ -118,7 +98,6 @@ public class Scraper {
                 tries++;
                 continue;
             }
-
 
             elementsArrayList.add(itemsList);
 
@@ -134,10 +113,6 @@ public class Scraper {
         }
         return elementsArrayList;
     };
-
-
-
-
 
     private Elements scrapSite(int page) throws IOException, InterruptedException {
         String url = buildUrl(page);
@@ -165,18 +140,6 @@ public class Scraper {
         return url.toString();
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Scraper scraper = new Scraper( PropertyType.APARTMENTS,
-                PurchaseType.FOR_SALE,
-                CityType.KRAKOW,
-                VoivodeshipType.LESSER_POLAND,
-                Limit.LIMIT_72);
-        for (int i = 0; i < 20; i++) {
-            System.out.println(scraper.scrapSite(i));
-        }
-
-    }
-
     private Connection connectToSite(String url) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             logger.info("Scraping interrupted, exiting connectToSite");
@@ -185,19 +148,12 @@ public class Scraper {
         return Jsoup.connect(url);
     }
 
-    private Document getDocument(Connection connection) throws IOException, InterruptedException {
+    private Document getDocument(Connection connection) throws IOException {
         return connection.get();
     }
 
-    private Elements getItemsList(Document document) throws InterruptedException {
-
-        return document.select(
-
-                        "[data-cy=listing-item-link]"
-        ); // lub data-cy="listing-item"
+    private Elements getItemsList(Document document) {
+        return document.select("[data-cy=listing-item-link]");
     }
-
-
-
 
 }

@@ -7,7 +7,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
-import pl.hubertmaka.project.interfaces.Scraper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,13 +16,18 @@ public class ScraperOlx {
     private final String coreUrl = "https://www.olx.pl/nieruchomosci/";
     private final PropertyType propertyType;
     private final PurchaseType purchaseType;
+    private final CityType cityType;
+    private final VoivodeshipType voivodeshipType;
 
-    protected volatile boolean isScrapingCancelled = false;
-    public void cancelScraping() {
-        this.isScrapingCancelled = true;
-    }
-    public void startScraping() {
-        this.isScrapingCancelled = false;
+    public ScraperOlx(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType) {
+        this.propertyType = propertyType;
+        this.purchaseType = purchaseType;
+        if (cityType == CityType.ZIELONA_GORA) {
+            this.cityType = CityType.ZIELONA_GORA_OLX;
+        } else {
+            this.cityType = cityType;
+        }
+        this.voivodeshipType = voivodeshipType;
     }
 
     public PropertyType getPropertyType() {
@@ -42,30 +46,12 @@ public class ScraperOlx {
         return voivodeshipType;
     }
 
-    private final CityType cityType;
-    private final VoivodeshipType voivodeshipType;
-
-    // Do scrapwoania poszczególnych miast
-    public ScraperOlx(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType) {
-        this.propertyType = propertyType;
-        this.purchaseType = purchaseType;
-        if (cityType == CityType.ZIELONA_GORA) {
-            this.cityType = CityType.ZIELONA_GORA_OLX;
-        } else {
-            this.cityType = cityType;
-        }
-        this.voivodeshipType = voivodeshipType;
-    }
-
     protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
         int page = 1;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
-            if (isScrapingCancelled) {
-                break;
-            }
-            Elements itemsList = scrapSite(page, true);
+            Elements itemsList = scrapSite(page);
 
             if (itemsList.isEmpty()) {
                 logger.info("No more elements.");
@@ -90,10 +76,7 @@ public class ScraperOlx {
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
-            if (isScrapingCancelled) {
-                break;
-            }
-            Elements itemsList = scrapSite(page, true);
+            Elements itemsList = scrapSite(page);
 
             if (itemsList.isEmpty()) {
                 logger.info("No more elements.");
@@ -135,27 +118,9 @@ public class ScraperOlx {
         return url.toString();
     }
 
-    private String buildUrlAllVoivodeship(int page) {
-        StringBuilder url = new StringBuilder();
-        url.append(coreUrl)
-                .append(this.propertyType.getPolishName()).append("/")
-                .append(this.purchaseType.getPolishName()).append("/")
-                .append(this.voivodeshipType.getPolishName()).append("/")
-                .append("?page=").append(page);
-        return url.toString();
-    }
-
-
-    private Elements scrapSite(int page, boolean scrapOnlyCity) throws IOException, InterruptedException {
+    private Elements scrapSite(int page) throws IOException, InterruptedException {
         String url;
-        if (scrapOnlyCity) {
-            url = buildUrlOnlyCity(page);
-            logger.info("Choosing scraping only cities");
-        } else {
-            url = buildUrlAllVoivodeship(page);
-            logger.info("Choosing scraping voivodeships");
-        }
-
+        url = buildUrlOnlyCity(page);
         logger.info("Building url nr: " + page);
         Connection connection = this.connectToSite(url);
         logger.info("Connecting to site nr: " + page);

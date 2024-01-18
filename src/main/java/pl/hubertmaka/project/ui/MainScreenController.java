@@ -18,6 +18,7 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -32,25 +33,8 @@ public class MainScreenController {
     private final ObservableList<ApartmentInfo> apartmentList = FXCollections.observableArrayList();
     public final ScraperApi scraperApi = new ScraperApi();
 
-    public MainScreenController() {
-        voivodeshipToCities.put("Dolnośląskie", Arrays.asList("Wrocław", "Wałbrzych", "Legnica", "Jelenia Góra", "Lubin"));
-        voivodeshipToCities.put("Kujawsko-Pomorskie", Arrays.asList("Bydgoszcz", "Toruń", "Włocławek", "Grudziądz", "Inowrocław"));
-        voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy"));
-        voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań"));
-        voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów"));
-        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów"));
-        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków"));
-        voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork"));
-        voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg"));
-        voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski"));
-        voivodeshipToCities.put("Pomorskie", Arrays.asList("Gdańsk", "Gdynia", "Słupsk", "Tczew", "Starogard Gdański"));
-        voivodeshipToCities.put("Śląskie", Arrays.asList("Katowice", "Częstochowa", "Sosnowiec", "Gliwice", "Zabrze"));
-        voivodeshipToCities.put("Świętokrzyskie", Arrays.asList("Kielce", "Ostrowiec Świętokrzyski", "Starachowice", "Sandomierz", "Skarżysko-Kamienna"));
-        voivodeshipToCities.put("Warmińsko-Mazurskie", Arrays.asList("Olsztyn", "Elbląg", "Ełk", "Ostróda", "Iława"));
-        voivodeshipToCities.put("Wielkopolskie", Arrays.asList("Poznań", "Kalisz", "Konin", "Piła", "Ostrów Wielkopolski"));
-        voivodeshipToCities.put("Zachodniopomorskie", Arrays.asList("Szczecin", "Koszalin", "Stargard", "Kołobrzeg", "Świnoujście"));
-    }
-
+    private ObservableList<ApartmentInfo> filteredList = FXCollections.observableArrayList();
+    private ObservableList<ApartmentInfo> allApartments = FXCollections.observableArrayList();
     @FXML
     public Label infoLabel;
     @FXML
@@ -65,23 +49,23 @@ public class MainScreenController {
     private ListView<ApartmentInfo> apartmentListView;
     @FXML
     private Button loadDataButton;
-
-    @FXML
-    private ComboBox<String> filterByCityComboBox;
-    @FXML
-    private ComboBox<String> filterByVoivodeshipComboBox;
-    @FXML
-    private ComboBox<String> sortByComboBox;
-
     @FXML
     private RadioButton forSaleRadioButton;
     @FXML
     private RadioButton forRentRadioButton;
     @FXML
     private ToggleGroup purchaseTypeGroup;
+    @FXML
+    private ComboBox<String> filterByCityComboBox;
+    @FXML
+    private ComboBox<String> filterByDistrictComboBox;
+    @FXML
+    private ComboBox<String> sortByComboBox;
 
-
-
+    public MainScreenController() {
+        initializeVoivodeshipToCities();
+        normalizeVoivodeshipToCities();
+    }
 
     @FXML
     public void initialize() {
@@ -91,10 +75,9 @@ public class MainScreenController {
         apartmentListView.setItems(apartmentList);
         initializeVoivodeshipCheckComboBox();
         initializeCityCheckComboBox();
-        initializeFilterAndSortComboBoxes();
-        normalizeVoivodeshipToCities();
         forSaleRadioButton.setToggleGroup(purchaseTypeGroup);
         forRentRadioButton.setToggleGroup(purchaseTypeGroup);
+        initializeSortOptions();
         apartmentListView.setCellFactory(new Callback<ListView<ApartmentInfo>, ListCell<ApartmentInfo>>() {
             @Override
             public ListCell<ApartmentInfo> call(ListView<ApartmentInfo> listView) {
@@ -105,45 +88,45 @@ public class MainScreenController {
                         if (empty || item == null) {
                             setGraphic(null);
                         } else {
-                            VBox vbox = new VBox(5); // wertykalny układ dla elementów
+                            VBox vbox = new VBox(5);
 
-                            Text title = new Text("Title: " + item.getTitle());
+                            Text title = new Text("Tytuł ogłoszenia: " + item.getTitle());
                             String purchaseTypeInfo;
                             if (item.getPurchaseType().equals(PurchaseType.ON_RENT.getPolishName())) {
                                 purchaseTypeInfo = "WYNAJEM";
                             } else {
                                 purchaseTypeInfo = "SPRZEDAŻ";
                             }
-                            Text purchaseType = new Text("Purchase Type: " + purchaseTypeInfo);
-                            Text fromSite = new Text("From Site: " + item.getFromSite());
-                            Text voivodeship = new Text("Voivodeship: " + item.getVoivodeship());
-                            Text city = new Text("City: " + item.getCity());
-                            Text district = new Text("District: " + item.getDistrict());
-                            Text street = new Text("Street: " + item.getStreet());
+                            Text purchaseType = new Text("Rodzaj zakupu: " + purchaseTypeInfo);
+                            Text fromSite = new Text("Informacje ze strony: " + item.getFromSite());
+                            Text voivodeship = new Text("Województwo: " + item.getVoivodeship());
+                            Text city = new Text("Miasto: " + item.getCity());
+                            Text district = new Text("Dzielnica: " + item.getDistrict());
+                            Text street = new Text("Ulica: " + item.getStreet());
                             String priceInfo;
                             String pricePerMeterInfo;
                             String roomsInfo;
                             if (item.getPrice() < 0) {
-                                priceInfo = "Price: Not defined.";
+                                priceInfo = "Cenia: Niezdefiniowana";
                             } else {
-                               priceInfo = "Price: " + item.getPrice().toString() + " zł";
+                               priceInfo = "Cena: " + item.getPrice().toString() + " zł";
                             }
                             if (item.getPricePerMeter() < 0) {
-                                pricePerMeterInfo = "Price per meter: Not defined.";
+                                pricePerMeterInfo = "Cena za metr: niezdefiniowana";
                             } else {
-                                pricePerMeterInfo = "Price per meter: " + item.getPrice().toString() + " zł/m²";
+                                pricePerMeterInfo = "Cena za metr: " + item.getPricePerMeter().toString() + " zł/m²";
                             }
                             if (item.getRooms() <= 0) {
-                                roomsInfo = "Rooms: Not defined.";
+                                roomsInfo = "Liczba pokoi: Niezdefiniowana.";
                             } else {
-                                roomsInfo = "Rooms: " + item.getRooms().toString();
+                                roomsInfo = "Liczba pokoi: " + item.getRooms().toString();
                             }
                             Text price = new Text(priceInfo);
                             Text pricePerMeter = new Text(pricePerMeterInfo);
                             Text rooms = new Text(roomsInfo);
-                            Text size = new Text("Size: " + item.getSize().toString() + " m²");
-                            Text isBoosted = new Text("Is boosted: " + item.isBoosted());
-                            Text additionalInfo = new Text("Additional Info: " + item.getAdditionalInfo());
+                            Text size = new Text("Rozmiar mieszkania: " + item.getSize().toString() + " m²");
+                            Text isBoosted = new Text("Czy niedawno podbite: " + item.isBoosted());
+                            Text additionalInfo = new Text("Dodatkowe informacje: " + item.getAdditionalInfo());
                             additionalInfo.setWrappingWidth(300);
 
                             Hyperlink link = new Hyperlink(item.getLinkToAnnouncement());
@@ -167,6 +150,74 @@ public class MainScreenController {
 
     }
 
+    private void updateComboBoxes() {
+        Set<String> cities = new HashSet<>();
+        Set<String> districts = new HashSet<>();
+
+        for (ApartmentInfo apartment : allApartments) {
+            if (apartment.getCity() != null) {
+                cities.add(apartment.getCity());
+            }
+            if (apartment.getDistrict() != null) {
+                districts.add(apartment.getDistrict());
+            }
+        }
+
+        filterByCityComboBox.setItems(FXCollections.observableArrayList(cities));
+        filterByDistrictComboBox.setItems(FXCollections.observableArrayList(districts));
+    }
+
+    private void initializeSortOptions() {
+        sortByComboBox.setItems(FXCollections.observableArrayList(
+                "Domyślnie",
+                "Cena rosnąco",
+                "Cena malejąco",
+                "Cena za metr rosnąco",
+                "Cena za metr malejąco",
+                "Rozmiar rosnąco",
+                "Rozmiar malejąco",
+                "Alfabetycznie dzielnice A-Z",
+                "Alfabetycznie dzielnice Z-A",
+                "Alfabetycznie miasta A-Z",
+                "Alfabetycznie miasta Z-A",
+                "Alfabetycznie województwa A-Z",
+                "Alfabetycznie województwa Z-A"
+        ));
+        sortByComboBox.setValue("Domyślnie");
+    }
+
+    private void initializeVoivodeshipToCities() {
+        voivodeshipToCities.put("Dolnośląskie", Arrays.asList("Wrocław", "Wałbrzych", "Legnica", "Jelenia Góra", "Lubin"));
+        voivodeshipToCities.put("Kujawsko-Pomorskie", Arrays.asList("Bydgoszcz", "Toruń", "Włocławek", "Grudziądz", "Inowrocław"));
+        voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy"));
+        voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań"));
+        voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów"));
+        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów"));
+        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków"));
+        voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork"));
+        voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg"));
+        voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski"));
+        voivodeshipToCities.put("Pomorskie", Arrays.asList("Gdańsk", "Gdynia", "Słupsk", "Tczew", "Starogard Gdański"));
+        voivodeshipToCities.put("Śląskie", Arrays.asList("Katowice", "Częstochowa", "Sosnowiec", "Gliwice", "Zabrze"));
+        voivodeshipToCities.put("Świętokrzyskie", Arrays.asList("Kielce", "Ostrowiec Świętokrzyski", "Starachowice", "Sandomierz", "Skarżysko-Kamienna"));
+        voivodeshipToCities.put("Warmińsko-Mazurskie", Arrays.asList("Olsztyn", "Elbląg", "Ełk", "Ostróda", "Iława"));
+        voivodeshipToCities.put("Wielkopolskie", Arrays.asList("Poznań", "Kalisz", "Konin", "Piła", "Ostrów Wielkopolski"));
+        voivodeshipToCities.put("Zachodniopomorskie", Arrays.asList("Szczecin", "Koszalin", "Stargard", "Kołobrzeg", "Świnoujście"));
+    }
+    private String normalizeString(String input) {
+        return input.toLowerCase()
+                .replace("-", "--")
+                .replace(" ", "-")
+                .replace("ą", "a")
+                .replace("ć", "c")
+                .replace("ę", "e")
+                .replace("ł", "l")
+                .replace("ń", "n")
+                .replace("ó", "o")
+                .replace("ś", "s")
+                .replace("ż", "z")
+                .replace("ź", "z");
+    }
 
     private void normalizeVoivodeshipToCities() {
         normalizedVoivodeshipToCities.clear();
@@ -181,50 +232,6 @@ public class MainScreenController {
 
             normalizedVoivodeshipToCities.put(normalizedKey, normalizedCities);
         }
-    }
-
-    private void initializeFilterAndSortComboBoxes() {
-        // Inicjalizacja ComboBoxów dla filtrowania i sortowania
-        filterByCityComboBox.setItems(FXCollections.observableArrayList("Wszystkie miasta", "Kraków", "Warszawa", "Wrocław"));
-        filterByVoivodeshipComboBox.setItems(FXCollections.observableArrayList("Wszystkie województwa", "Małopolskie", "Mazowieckie", "Dolnośląskie"));
-        sortByComboBox.setItems(FXCollections.observableArrayList("Cena", "Rozmiar", "Cena za metr"));
-
-        // Dodaj listenery do ComboBoxów
-        filterByCityComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> filterApartments());
-        filterByVoivodeshipComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> filterApartments());
-        sortByComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> sortApartments());
-    }
-    private void sortApartments() {
-        String selectedSort = sortByComboBox.getValue();
-
-        Comparator<ApartmentInfo> comparator;
-        switch (selectedSort) {
-            case "Cena":
-                comparator = Comparator.comparing(ApartmentInfo::getPrice);
-                break;
-            case "Rozmiar":
-                comparator = Comparator.comparing(ApartmentInfo::getSize);
-                break;
-            case "Cena za metr":
-                comparator = Comparator.comparing(ApartmentInfo::getPricePerMeter);
-                break;
-            default:
-                return;
-        }
-
-        ObservableList<ApartmentInfo> sortedList = apartmentListView.getItems().sorted(comparator);
-        apartmentListView.setItems(sortedList);
-    }
-    private void filterApartments() {
-        String selectedCity = filterByCityComboBox.getValue();
-        String selectedVoivodeship = filterByVoivodeshipComboBox.getValue();
-
-        ObservableList<ApartmentInfo> filteredList = apartmentList.stream()
-                .filter(apartment -> (selectedCity.equals("Wszystkie miasta") || apartment.getCity().equals(selectedCity)) &&
-                        (selectedVoivodeship.equals("Wszystkie województwa") || apartment.getVoivodeship().equals(selectedVoivodeship)))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList));
-
-        apartmentListView.setItems(filteredList);
     }
 
 
@@ -261,19 +268,74 @@ public class MainScreenController {
         String normalizedVoivodeshipName = normalizeString(voivodeshipName);
         return VoivodeshipType.valueOfLabel(normalizedVoivodeshipName);
     }
+    @FXML
+    protected void handleFilterAndSort() {
+        String selectedCity = filterByCityComboBox.getValue();
+        String selectedDistrict = filterByDistrictComboBox.getValue();
 
-    private String normalizeString(String input) {
-        return input.toLowerCase()
-                .replace(" ", "-")
-                .replace("ą", "a")
-                .replace("ć", "c")
-                .replace("ę", "e")
-                .replace("ł", "l")
-                .replace("ń", "n")
-                .replace("ó", "o")
-                .replace("ś", "s")
-                .replace("ż", "z")
-                .replace("ź", "z");
+        Stream<ApartmentInfo> stream = allApartments.stream()
+                .filter(apartment -> (selectedCity == null || apartment.getCity().equals(selectedCity)))
+                .filter(apartment -> (selectedDistrict == null || apartment.getDistrict().equals(selectedDistrict)));
+
+        Comparator<ApartmentInfo> comparator = getComparator(sortByComboBox.getValue());
+        if (comparator != null) {
+            stream = stream.sorted(comparator);
+        }
+
+        apartmentListView.setItems(FXCollections.observableArrayList(stream.collect(Collectors.toList())));
+    }
+
+
+
+    private void applyFilterAndSort() {
+        Set<String> selectedVoivodeships = new HashSet<>(voivodeshipCheckComboBox.getCheckModel().getCheckedItems());
+        Set<String> selectedCities = new HashSet<>(cityCheckComboBox.getCheckModel().getCheckedItems());
+        String selectedSortOption = sortByComboBox.getValue();
+
+        // Filtrowanie
+        Stream<ApartmentInfo> stream = allApartments.stream()
+                .filter(apartment -> (selectedVoivodeships.isEmpty() || selectedVoivodeships.contains(apartment.getVoivodeship()))
+                        && (selectedCities.isEmpty() || selectedCities.contains(apartment.getCity())));
+
+        // Sortowanie
+        Comparator<ApartmentInfo> comparator = getComparator(selectedSortOption);
+        if (comparator != null) {
+            stream = stream.sorted(comparator);
+        }
+
+        filteredList.setAll(stream.collect(Collectors.toList()));
+        logger.info("Filtrowanie i sortowanie zakończone. Liczba wyników: " + filteredList.size());
+    }
+    private Comparator<ApartmentInfo> getComparator(String sortOption) {
+        if (sortOption == null || sortOption.equals("Domyślnie")) return null;
+        switch (sortOption) {
+            case "Cena rosnąco":
+                return Comparator.comparing(ApartmentInfo::getPrice);
+            case "Cena malejąco":
+                return Comparator.comparing(ApartmentInfo::getPrice).reversed();
+            case "Cena za metr rosnąco":
+                return Comparator.comparing(ApartmentInfo::getPricePerMeter);
+            case "Cena za metr malejąco":
+                return Comparator.comparing(ApartmentInfo::getPricePerMeter).reversed();
+            case "Rozmiar rosnąco":
+                return Comparator.comparing(ApartmentInfo::getSize);
+            case "Rozmiar malejąco":
+                return Comparator.comparing(ApartmentInfo::getSize).reversed();
+            case "Alfabetycznie dzielnice A-Z":
+                return Comparator.comparing(ApartmentInfo::getDistrict);
+            case "Alfabetycznie dzielnice Z-A":
+                return Comparator.comparing((ApartmentInfo::getDistrict)).reversed();
+            case "Alfabetycznie miasta A-Z":
+                return Comparator.comparing(ApartmentInfo::getCity);
+            case "Alfabetycznie miasta Z-A":
+                return Comparator.comparing((ApartmentInfo::getCity)).reversed();
+            case "Alfabetycznie województwa A-Z":
+                return Comparator.comparing(ApartmentInfo::getVoivodeship);
+            case "Alfabetycznie województwa Z-A":
+                return Comparator.comparing((ApartmentInfo::getVoivodeship)).reversed();
+            default:
+                return null;
+        }
     }
 
     @FXML
@@ -323,14 +385,15 @@ public class MainScreenController {
             if (apartmentList.isEmpty()) {
                 infoLabel.setVisible(true);
             }
-            apartmentList.clear();
+            allApartments.clear();
+            allApartments.addAll(scraperApi.apartmentInfoArrayList);
+            updateComboBoxes();
             apartmentList.addAll(scraperApi.apartmentInfoArrayList);
-            scraperApi.apartmentInfoArrayList.clear();
+            logger.info("Dane załadowane. Liczba apartamentów: " + allApartments.size());
             loadingLabel.setVisible(false);
             apartmentListView.setItems(apartmentList);
             loadDataButton.setDisable(false);
             cancelLoadDataButton.setVisible(false);
-
 
             // Logowanie sukcesu
             System.out.println("Zadanie zakończone sukcesem. Dane załadowane.");

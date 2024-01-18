@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ApartmentInfo {
-    private final static Logger logger = LogManager.getLogger(ApartmentInfo.class);
     private String fromSite = null;
 
     public String getFromSite() {

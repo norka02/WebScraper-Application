@@ -1,0 +1,55 @@
+.root {
+    -fx-background-color: #f0f0f0;
+}
+
+.vbox {
+    -fx-padding: 15;
+    -fx-spacing: 15;
+    -fx-alignment: top-left;
+}
+.list-view .list-cell {
+    -fx-alignment: top-left;
+    -fx-padding: 5 10;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #e0e0e0;
+}
+
+.button {
+    -fx-background-color: #5a8f9d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: #3e6e79;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #3e6e79;
+}
+
+
+.combo-box {
+    -fx-pref-width: 200px;
+    -fx-text-fill: black;
+}
+
+.combo-box .list-cell, .combo-box .cell {
+    -fx-wrap-text: true;
+    -fx-pref-width: 150px;
+    -fx-text-fill: black;
+}
+
+.list-view {
+    -fx-pref-width: 700px;
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 5;
+    -fx-padding: 10 20 10 10;
+}
+
+.label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #3e6e79;
+}
