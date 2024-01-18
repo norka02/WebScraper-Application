@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ListView?>
+<?import org.controlsfx.control.CheckComboBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="pl.hubertmaka.project.ui.MainScreenController">
-    <Button layoutX="223.0" layoutY="187.0" mnemonicParsing="false" onAction="#onButtonClick"
-            text="THIS IS INITIAL BUTTON"/>
-    <Label layoutX="223.0" layoutY="14.0" prefHeight="50.0" prefWidth="155.0" text="WebScraper Application">
-        <font>
-            <Font size="15.0"/>
-        </font>
-    </Label>
-</AnchorPane>
+<?import javafx.scene.control.ComboBox?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="868.0" prefWidth="1282.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.hubertmaka.project.ui.MainScreenController">
+
+    <!-- Lewy Panel z CheckComboBox i Przyciskami -->
+    <left>
+        <VBox spacing="10" prefWidth="200"  style="-fx-padding: 80 40 80 40;">
+            <CheckComboBox fx:id="voivodeshipCheckComboBox" />
+            <CheckComboBox fx:id="cityCheckComboBox" />
+            <Button fx:id="loadDataButton" onAction="#handleLoadData" text="Load Data" />
+            <Button fx:id="cancelLoadDataButton" onAction="#handleCancelLoadData" text="Cancel Load" visible="false"/>
+            <ComboBox fx:id="filterByCityComboBox" />
+            <ComboBox fx:id="filterByVoivodeshipComboBox"  />
+            <ComboBox fx:id="sortByComboBox"  />
+
+            <Label fx:id="loadingLabel" style="-fx-text-fill: black; -fx-font-size: 16px;" text="Loading data... It can take some time depends on cities to get. You can go take some tea and when you will return it should be finished ;)" wrapText="true" />
+        </VBox>
+    </left>
+
+    <!-- Prawy Panel z ListView -->
+    <center>
+
+
+        <ListView fx:id="apartmentListView" prefWidth="1000"/>
+
+    </center>
+
+</BorderPane>

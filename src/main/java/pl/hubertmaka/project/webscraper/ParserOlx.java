@@ -105,7 +105,7 @@ public class ParserOlx extends ScraperOlx {
         }
 
         for (int i = 0; i < labels.length; i++) {
-            String textValue = sizeAndPricePerMeterArray.get(i).replaceAll("[^\\d,]", "").replace(",", ".");
+            String textValue = sizeAndPricePerMeterArray.get(i).replaceAll("[^\\d.]", "");
             apartmentInfosHashMap.put(labels[i], textValue);
         }
         return apartmentInfosHashMap;

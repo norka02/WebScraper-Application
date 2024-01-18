@@ -5,6 +5,8 @@ module pl.hubertmaka.project {
     requires org.apache.logging.log4j;
     requires org.apache.logging.log4j.core;
     requires org.jsoup;
+    requires java.desktop;
+    requires org.controlsfx.controls;
 
     // Eksportowanie pakietów
     exports pl.hubertmaka.project to javafx.graphics;

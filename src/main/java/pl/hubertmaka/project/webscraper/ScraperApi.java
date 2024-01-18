@@ -5,14 +5,24 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class ScraperApi {
     private static final Logger logger = LogManager.getLogger(ScraperApi.class);
-    private ArrayList<ApartmentInfo> apartmentInfoArrayList = new ArrayList<>();
+    public ArrayList<ApartmentInfo> apartmentInfoArrayList = new ArrayList<>();
+    private ExecutorService executorService = Executors.newFixedThreadPool(2);
 
+    public void shutdownExecutorService() {
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
+        }
+    }
     public static void main(String[] args) throws IOException {
         try {
             ScraperApi scraperApi = new ScraperApi();
@@ -26,20 +36,35 @@ public class ScraperApi {
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void createApartmentInfoArrayList() throws IOException, InterruptedException {
+
+
+    public void createApartmentInfoArrayList() throws IOException, InterruptedException, ExecutionException {
+        ExecutorService executor = Executors.newFixedThreadPool(2); // Utwórz pulę wątków z dwoma wątkami
+
         ParserOlx parserOlx = this.createOlxParser();
         Parser parser = this.createOtodomParser();
 
-        ArrayList<Elements> elementsArrayListOtodom = this.getElementsFromSite(parser);
-        ArrayList<Elements> elementsArrayListOlx = this.getElementsFromSite(parserOlx);
+        // Utwórz zadania
+        Future<ArrayList<Elements>> futureOtodom = executor.submit(() -> getElementsFromSite(parser));
+        Future<ArrayList<Elements>> futureOlx = executor.submit(() -> getElementsFromSite(parserOlx));
+
+        // Pobierz wyniki
+        ArrayList<Elements> elementsArrayListOtodom = futureOtodom.get();
+        ArrayList<Elements> elementsArrayListOlx = futureOlx.get();
+
+        // Zamknij ExecutorService
+        executor.shutdown();
+
         ArrayList<ApartmentInfo> apartmentInfoArrayListOtodom = this.createApartmentInfoArrayList(elementsArrayListOtodom, parser);
         ArrayList<ApartmentInfo> apartmentInfoArrayListOlx = this.createApartmentInfoArrayList(elementsArrayListOlx, parserOlx);
+
         this.apartmentInfoArrayList.addAll(apartmentInfoArrayListOtodom);
         this.apartmentInfoArrayList.addAll(apartmentInfoArrayListOlx);
-
     }
 
     private ParserOlx createOlxParser() {
@@ -63,18 +88,13 @@ public class ScraperApi {
         );
     }
 
+
     private ArrayList<Elements> getElementsFromSite(Parser parser) throws IOException, InterruptedException {
-        ArrayList<Elements> elementsArrayList = new ArrayList<>();
-        elementsArrayList.addAll(parser.getAllElementsFromSite(1));
-        elementsArrayList.addAll(parser.getAllElementsFromSite(1));
-        return  elementsArrayList;
+        return new ArrayList<>(parser.getAllElementsFromSite(1));
     }
 
     private ArrayList<Elements> getElementsFromSite(ParserOlx parserOlx) throws IOException, InterruptedException {
-        ArrayList<Elements> elementsArrayList = new ArrayList<>();
-        elementsArrayList.addAll(parserOlx.getAllElementsFromSite(1));
-        elementsArrayList.addAll(parserOlx.getAllElementsFromSite(1));
-        return  elementsArrayList;
+        return new ArrayList<>(parserOlx.getAllElementsFromSite(1));
     }
 
     private ArrayList<ApartmentInfo> createApartmentInfoArrayList(ArrayList<Elements> elementsArrayList, ParserOlx parserOlx) {

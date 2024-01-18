@@ -18,6 +18,14 @@ public class ScraperOlx {
     private final PropertyType propertyType;
     private final PurchaseType purchaseType;
 
+    protected volatile boolean isScrapingCancelled = false;
+    public void cancelScraping() {
+        this.isScrapingCancelled = true;
+    }
+    public void startScraping() {
+        this.isScrapingCancelled = false;
+    }
+
     public PropertyType getPropertyType() {
         return propertyType;
     }
@@ -50,6 +58,9 @@ public class ScraperOlx {
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
+            if (isScrapingCancelled) {
+                break;
+            }
             Elements itemsList = scrapSite(page, true);
 
             if (itemsList.isEmpty()) {
@@ -75,6 +86,9 @@ public class ScraperOlx {
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
+            if (isScrapingCancelled) {
+                break;
+            }
             Elements itemsList = scrapSite(page, true);
 
             if (itemsList.isEmpty()) {

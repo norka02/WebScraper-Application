@@ -37,7 +37,14 @@ public class Parser extends Scraper {
         return apartmentInfoInstance;
     }
 
-
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Parser parser = new Parser(PropertyType.APARTMENTS,
+                PurchaseType.FOR_SALE,
+                CityType.KRAKOW,
+                VoivodeshipType.LESSER_POLAND,
+                Limit.LIMIT_24);
+        parser.getAllElementsFromSite();
+    }
 
     private String getImgElementText(Element listItem) {
         Element imgElement = listItem.selectFirst("img");

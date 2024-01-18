@@ -25,6 +25,16 @@ public class Scraper {
     private final VoivodeshipType voivodeshipType;
     private final Limit limit;
 
+    private volatile boolean isScrapingCancelled = false;
+
+
+    public void cancelScraping() {
+        this.isScrapingCancelled = true;
+    }
+    public void startScraping() {
+        this.isScrapingCancelled = false;
+    }
+
     public PropertyType getPropertyType() {
         return propertyType;
     }
@@ -55,14 +65,27 @@ public class Scraper {
 
     protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
+        int tries = 0;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
         while (true) {
+            if (isScrapingCancelled) {
+                break;
+            }
+
+            if (tries >= 5) {
+                logger.info("No more elements");
+                break;
+            }
+
             Elements itemsList = scrapSite(page);
 
             if (itemsList.isEmpty()) {
                 logger.info("No more elements.");
-                break;
+                tries++;
+                continue;
             }
+
+            tries = 0;
 
             elementsArrayList.add(itemsList);
             logger.info("Adding elements to ArrayList nr:" + page);
@@ -75,18 +98,31 @@ public class Scraper {
 
     protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
         int page = 1;
+        int tries = 0;
         ArrayList<Elements> elementsArrayList = new ArrayList<>();
 
         while (true) {
-            Elements itemsList = scrapSite(page);
-
-            if (itemsList.isEmpty()) {
-                logger.info("No more elements.");
+            if (isScrapingCancelled) {
                 break;
-
             }
 
+            if (tries >= 5) {
+                logger.info("No more elements");
+                break;
+            }
+            Elements itemsList = scrapSite(page);
+
+
+            if (itemsList.isEmpty()) {
+                logger.info("Trying one more time: " + tries);
+                tries++;
+                continue;
+            }
+
+
             elementsArrayList.add(itemsList);
+
+            tries = 0;
 
             if (page == max_pages) {
                 break;
@@ -99,7 +135,11 @@ public class Scraper {
         return elementsArrayList;
     };
 
-    private Elements scrapSite(int page) throws IOException {
+
+
+
+
+    private Elements scrapSite(int page) throws IOException, InterruptedException {
         String url = buildUrl(page);
         logger.info("Building url nr: " + page);
         Connection connection = this.connectToSite(url);
@@ -118,25 +158,38 @@ public class Scraper {
                 .append(this.purchaseType.getPolishName()).append("/")
                 .append(this.propertyType.getPolishName()).append("/")
                 .append(this.voivodeshipType.getPolishName()).append("/")
-                .append(this.cityType.getPolishName())
-                .append("?limit=").append(this.limit.getLimit())
+                .append(this.cityType.getPolishName()).append("?limit=").append(this.limit.getLimit())
+                .append("&ownerTypeSingleSelect=ALL&by=DEFAULT&direction=DESC&viewType=listing")
                 .append("&page=").append(page);
+
         return url.toString();
     }
 
-    private Connection connectToSite(String url) {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Scraper scraper = new Scraper( PropertyType.APARTMENTS,
+                PurchaseType.FOR_SALE,
+                CityType.KRAKOW,
+                VoivodeshipType.LESSER_POLAND,
+                Limit.LIMIT_72);
+        for (int i = 0; i < 20; i++) {
+            System.out.println(scraper.scrapSite(i));
+        }
+
+    }
+
+    private Connection connectToSite(String url) throws InterruptedException {
+        Thread.sleep(1000);
         return Jsoup.connect(url);
     }
 
-    private Document getDocument(Connection connection) throws IOException {
+    private Document getDocument(Connection connection) throws IOException, InterruptedException {
         return connection.get();
     }
 
-    private Elements getItemsList(Document document) {
+    private Elements getItemsList(Document document) throws InterruptedException {
+
         return document.select(
-                "[data-cy=search.listing.organic] " +
-                        "ul.css-rqwdxd.e1tno8ef0 " +
-                        "li.css-o9b79t.e1dfeild0 " +
+
                         "[data-cy=listing-item-link]"
         ); // lub data-cy="listing-item"
     }
