@@ -8,6 +8,7 @@ import pl.hubertmaka.project.enums.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Parser extends Scraper {
@@ -100,13 +101,22 @@ public class Parser extends Scraper {
     private HashMap<String, String> mapLocations(String[] summaryLocationArray) {
         String[] possibleLocations = {"voivodeship", "city", "district", "street"};
         HashMap<String, String> extractedLocations = new HashMap<>();
-
+        System.out.println(Arrays.toString(summaryLocationArray));
         for (int i = 0; i < possibleLocations.length - 1; i++) {
-            extractedLocations.put(possibleLocations[i], summaryLocationArray[summaryLocationArray.length - (i + 1)]);
+            try {
+                extractedLocations.put(possibleLocations[i], summaryLocationArray[summaryLocationArray.length - (i + 1)]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                extractedLocations.put(possibleLocations[i], "Not defined");
+            }
         }
 
         // This loop can be used length - 2 times beacuse the street parameter from the scraped site is the fires arg
-        extractedLocations.put(possibleLocations[possibleLocations.length - 1], summaryLocationArray[0]);
+        try {
+            extractedLocations.put(possibleLocations[possibleLocations.length - 1], summaryLocationArray[0]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            extractedLocations.put(possibleLocations[possibleLocations.length - 1], "Not defined");
+        }
+
         return extractedLocations;
     }
 

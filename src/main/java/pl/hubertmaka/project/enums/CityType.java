@@ -28,6 +28,7 @@ public enum CityType {
     BIELSKO_BIALA("bielsko-biala"),
     BYTOM("bytom"),
     ZIELONA_GORA("zielona-gora"),
+    ZIELONA_GORA_OLX("zielonagora"),
     RYBNIK("rybnik"),
     RUDA_SLASKA("ruda-slaska"),
     OPOLE("opole"),

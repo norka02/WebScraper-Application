@@ -8,7 +8,6 @@ import java.util.Map;
 public enum VoivodeshipType implements Type {
     LOWER_SILESIA("dolnoslaskie"),
     KUYAVIA_POMERANIA("kujawsko--pomorskie"),
-    KUYAVIA_POMERANIA_OLX("kujawsko-pomorskie"),
     LUBLIN("lubelskie"),
     LUBLUSZ("lubuskie"),
     LODZ("lodzkie"),
@@ -21,10 +20,8 @@ public enum VoivodeshipType implements Type {
     SILESIA("slaskie"),
     SWIETOKRZYSKIE("swietokrzyskie"),
     WARMIA_MASURIA("warminsko--mazurskie"),
-    WARMIA_MASURIA_OLX("warminsko-mazurskie"),
     GREATER_POLAND("wielkopolskie"),
-    WEST_POMERANIAN("zachodniopomorskie"),
-    ALL_OTODOM("cala-polska");
+    WEST_POMERANIAN("zachodniopomorskie");
 
     private final String polishName;
     private static final Map<String, VoivodeshipType> BY_LABEL = new HashMap<>();

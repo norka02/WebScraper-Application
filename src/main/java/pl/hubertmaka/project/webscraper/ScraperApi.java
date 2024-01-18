@@ -55,11 +55,11 @@ public class ScraperApi {
         return apartmentInfos;
     }
 
-    public void createApartmentInfoArrayList(List<CityType> selectedCities, List<VoivodeshipType> selectedVoivodeships, Map<String, List<String>> voivodeshipToCities, PurchaseType purchaseType) throws IOException, InterruptedException {
-        apartmentInfoArrayList.clear(); // Wyczyszczenie listy przed dodaniem nowych danych
+    public void createApartmentInfoArrayList(List<CityType> selectedCities, List<VoivodeshipType> selectedVoivodeships, Map<String, List<String>> normalizedVoivodeshipToCities, PurchaseType purchaseType) {
+        apartmentInfoArrayList.clear();
 
         for (VoivodeshipType voivodeship : selectedVoivodeships) {
-            List<String> citiesInVoivodeship = voivodeshipToCities.get(voivodeship.getPolishName());
+            List<String> citiesInVoivodeship = normalizedVoivodeshipToCities.get(voivodeship.getPolishName());
             for (CityType city : selectedCities) {
                 if (city != null && citiesInVoivodeship != null && citiesInVoivodeship.contains(city.getPolishName())) {
                     logger.info("Creating parsers for city: " + city + " and voivodeship: " + voivodeship);

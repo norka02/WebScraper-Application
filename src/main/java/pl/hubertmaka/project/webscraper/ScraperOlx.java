@@ -49,7 +49,11 @@ public class ScraperOlx {
     public ScraperOlx(PropertyType propertyType, PurchaseType purchaseType, CityType cityType, VoivodeshipType voivodeshipType) {
         this.propertyType = propertyType;
         this.purchaseType = purchaseType;
-        this.cityType = cityType;
+        if (cityType == CityType.ZIELONA_GORA) {
+            this.cityType = CityType.ZIELONA_GORA_OLX;
+        } else {
+            this.cityType = cityType;
+        }
         this.voivodeshipType = voivodeshipType;
     }
 
