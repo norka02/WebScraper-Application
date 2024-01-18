@@ -21,6 +21,7 @@ public class ParserOlx extends ScraperOlx {
     public ApartmentInfo fillApartmentInfo(ApartmentInfo apartmentInfoInstance, Element listItem) {
         logger.info("Filling ApartmentInfo instance.");
         apartmentInfoInstance.setFromSite("OLX");
+        apartmentInfoInstance.setPurchaseType(this.getPurchaseType().getPolishName());
         apartmentInfoInstance.setTitle(getTitleText(listItem));
         apartmentInfoInstance.setVoivodeship(getVoivodeshipType().getPolishName());
         apartmentInfoInstance.setCity(extractLocationDetails(listItem).get("city"));

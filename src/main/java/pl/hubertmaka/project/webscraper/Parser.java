@@ -22,6 +22,7 @@ public class Parser extends Scraper {
 
         apartmentInfoInstance.setFromSite("OTODOM");
         apartmentInfoInstance.setTitle(getTitleText(listItem));
+        apartmentInfoInstance.setPurchaseType(this.getPurchaseType().getPolishName());
         apartmentInfoInstance.setVoivodeship(extractLocationDetails(listItem).get("voivodeship"));
         apartmentInfoInstance.setCity(extractLocationDetails(listItem).get("city"));
         apartmentInfoInstance.setDistrict(extractLocationDetails(listItem).get("district"));

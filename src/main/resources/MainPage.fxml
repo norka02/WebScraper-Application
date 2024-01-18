@@ -23,8 +23,8 @@
             <ComboBox fx:id="sortByComboBox"  />
             <children>
                 <Label text="Typ nieruchomości:"/>
-                <RadioButton fx:id="forSaleRadioButton" text="Na sprzedaż" selected="true" toggleGroup="$purchaseTypeGroup"/>
-                <RadioButton fx:id="forRentRadioButton" text="Na wynajem" toggleGroup="$purchaseTypeGroup"/>
+                <RadioButton fx:id="forSaleRadioButton" text="Na sprzedaż" selected="true"/>
+                <RadioButton fx:id="forRentRadioButton" text="Na wynajem"/>
             </children>
             <Label fx:id="loadingLabel" style="-fx-text-fill: black; -fx-font-size: 16px;" text="Loading data... It can take some time depends on cities to get. You can go take some tea and when you will return it should be finished ;)" wrapText="true" />
             <Label fx:id="infoLabel" style="-fx-text-fill: black; -fx-font-size: 16px;" text="You must to choose voivodeship and city first." wrapText="true" />

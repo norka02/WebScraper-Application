@@ -33,23 +33,24 @@ public class MainScreenController {
     public final ScraperApi scraperApi = new ScraperApi();
 
     public MainScreenController() {
-        voivodeshipToCities.put("Dolnośląskie", Arrays.asList("Wrocław", "Wałbrzych", "Legnica", "Jelenia Góra", "Lubin", "Głogów", "Świdnica", "Bolesławiec"));
-        voivodeshipToCities.put("Kujawsko-Pomorskie", Arrays.asList("Bydgoszcz", "Toruń", "Włocławek", "Grudziądz", "Inowrocław", "Brodnica", "Chełmno", "Świecie"));
-        voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy", "Świdnik", "Kraśnik", "Lubartów"));
-        voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań", "Świebodzin", "Międzyrzecz", "Kostrzyn nad Odrą"));
-        voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów", "Zgierz", "Skierniewice", "Radomsko"));
-        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów", "Olkusz", "Nowy Targ", "Bochnia"));
-        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków", "Ostrołęka", "Legionowo", "Ciechanów"));
-        voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork", "Prudnik", "Strzelce Opolskie", "Głubczyce"));
-        voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg", "Krosno", "Sanok", "Jasło"));
-        voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski", "Zambrów", "Hajnówka", "Siemiatycze"));
-        voivodeshipToCities.put("Pomorskie", Arrays.asList("Gdańsk", "Gdynia", "Słupsk", "Tczew", "Starogard Gdański", "Wejherowo", "Rumia", "Sopot"));
-        voivodeshipToCities.put("Śląskie", Arrays.asList("Katowice", "Częstochowa", "Sosnowiec", "Gliwice", "Zabrze", "Bytom", "Bielsko-Biała", "Ruda Śląska"));
-        voivodeshipToCities.put("Świętokrzyskie", Arrays.asList("Kielce", "Ostrowiec Świętokrzyski", "Starachowice", "Sandomierz", "Skarżysko-Kamienna", "Końskie", "Busko-Zdrój", "Jędrzejów"));
-        voivodeshipToCities.put("Warmińsko-Mazurskie", Arrays.asList("Olsztyn", "Elbląg", "Ełk", "Ostróda", "Iława", "Kętrzyn", "Szczytno", "Giżycko"));
-        voivodeshipToCities.put("Wielkopolskie", Arrays.asList("Poznań", "Kalisz", "Konin", "Piła", "Ostrów Wielkopolski", "Gniezno", "Leszno", "Śrem"));
-        voivodeshipToCities.put("Zachodniopomorskie", Arrays.asList("Szczecin", "Koszalin", "Stargard", "Kołobrzeg", "Świnoujście", "Szczecinek", "Wałcz", "Białogard"));
+        voivodeshipToCities.put("Dolnośląskie", Arrays.asList("Wrocław", "Wałbrzych", "Legnica", "Jelenia Góra", "Lubin"));
+        voivodeshipToCities.put("Kujawsko-Pomorskie", Arrays.asList("Bydgoszcz", "Toruń", "Włocławek", "Grudziądz", "Inowrocław"));
+        voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy"));
+        voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań"));
+        voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów"));
+        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów"));
+        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków"));
+        voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork"));
+        voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg"));
+        voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski"));
+        voivodeshipToCities.put("Pomorskie", Arrays.asList("Gdańsk", "Gdynia", "Słupsk", "Tczew", "Starogard Gdański"));
+        voivodeshipToCities.put("Śląskie", Arrays.asList("Katowice", "Częstochowa", "Sosnowiec", "Gliwice", "Zabrze"));
+        voivodeshipToCities.put("Świętokrzyskie", Arrays.asList("Kielce", "Ostrowiec Świętokrzyski", "Starachowice", "Sandomierz", "Skarżysko-Kamienna"));
+        voivodeshipToCities.put("Warmińsko-Mazurskie", Arrays.asList("Olsztyn", "Elbląg", "Ełk", "Ostróda", "Iława"));
+        voivodeshipToCities.put("Wielkopolskie", Arrays.asList("Poznań", "Kalisz", "Konin", "Piła", "Ostrów Wielkopolski"));
+        voivodeshipToCities.put("Zachodniopomorskie", Arrays.asList("Szczecin", "Koszalin", "Stargard", "Kołobrzeg", "Świnoujście"));
     }
+
     @FXML
     public Label infoLabel;
     @FXML
@@ -84,6 +85,7 @@ public class MainScreenController {
 
     @FXML
     public void initialize() {
+        purchaseTypeGroup = new ToggleGroup();
         cancelLoadDataButton.setVisible(false);
         loadingLabel.setVisible(false);
         apartmentListView.setItems(apartmentList);
@@ -91,6 +93,8 @@ public class MainScreenController {
         initializeCityCheckComboBox();
         initializeFilterAndSortComboBoxes();
         normalizeVoivodeshipToCities();
+        forSaleRadioButton.setToggleGroup(purchaseTypeGroup);
+        forRentRadioButton.setToggleGroup(purchaseTypeGroup);
         apartmentListView.setCellFactory(new Callback<ListView<ApartmentInfo>, ListCell<ApartmentInfo>>() {
             @Override
             public ListCell<ApartmentInfo> call(ListView<ApartmentInfo> listView) {
@@ -104,6 +108,13 @@ public class MainScreenController {
                             VBox vbox = new VBox(5); // wertykalny układ dla elementów
 
                             Text title = new Text("Title: " + item.getTitle());
+                            String purchaseTypeInfo;
+                            if (item.getPurchaseType().equals(PurchaseType.ON_RENT.getPolishName())) {
+                                purchaseTypeInfo = "WYNAJEM";
+                            } else {
+                                purchaseTypeInfo = "SPRZEDAŻ";
+                            }
+                            Text purchaseType = new Text("Purchase Type: " + purchaseTypeInfo);
                             Text fromSite = new Text("From Site: " + item.getFromSite());
                             Text voivodeship = new Text("Voivodeship: " + item.getVoivodeship());
                             Text city = new Text("City: " + item.getCity());
@@ -131,6 +142,7 @@ public class MainScreenController {
                             Text pricePerMeter = new Text(pricePerMeterInfo);
                             Text rooms = new Text(roomsInfo);
                             Text size = new Text("Size: " + item.getSize().toString() + " m²");
+                            Text isBoosted = new Text("Is boosted: " + item.isBoosted());
                             Text additionalInfo = new Text("Additional Info: " + item.getAdditionalInfo());
                             additionalInfo.setWrappingWidth(300);
 
@@ -145,7 +157,7 @@ public class MainScreenController {
                                 }
                             });
 
-                            vbox.getChildren().addAll(fromSite, title, voivodeship, city, district, street, price, pricePerMeter, rooms, size, additionalInfo, link);
+                            vbox.getChildren().addAll(fromSite, title,purchaseType, voivodeship, city, district, street, price, pricePerMeter, rooms, size,isBoosted, additionalInfo, link);
                             setGraphic(vbox);
                         }
                     }
