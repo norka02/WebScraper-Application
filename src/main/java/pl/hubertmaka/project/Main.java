@@ -25,7 +25,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainPage.fxml"));
             Parent root = loader.load();
             MainScreenController controller = loader.getController();
-            scraperApi = controller.getScraperApi();
+//            scraperApi = controller.getScraperApi();
 
             primaryStage.setTitle("Moja Aplikacja Web Scraper");
             primaryStage.setScene(new Scene(root, 1400, 1000));

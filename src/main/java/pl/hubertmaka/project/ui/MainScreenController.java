@@ -25,9 +25,10 @@ import javafx.concurrent.Task;
 
 public class MainScreenController {
     private static final Logger logger = LogManager.getLogger(MainScreenController.class);
-
-    private  Task<Void> loadDataTask;
+    private Task<Void> loadDataTask;
     private final Map<String, List<String>> voivodeshipToCities = new HashMap<>();
+    private final ObservableList<ApartmentInfo> apartmentList = FXCollections.observableArrayList();
+    public final ScraperApi scraperApi = new ScraperApi();
 
     public MainScreenController() {
         voivodeshipToCities.put("Dolnośląskie", Arrays.asList("Wrocław", "Wałbrzych", "Legnica", "Jelenia Góra", "Lubin", "Głogów", "Świdnica", "Bolesławiec"));
@@ -35,8 +36,8 @@ public class MainScreenController {
         voivodeshipToCities.put("Lubelskie", Arrays.asList("Lublin", "Chełm", "Zamość", "Biała Podlaska", "Puławy", "Świdnik", "Kraśnik", "Lubartów"));
         voivodeshipToCities.put("Lubuskie", Arrays.asList("Zielona Góra", "Gorzów Wielkopolski", "Nowa Sól", "Żary", "Żagań", "Świebodzin", "Międzyrzecz", "Kostrzyn nad Odrą"));
         voivodeshipToCities.put("Łódzkie", Arrays.asList("Łódź", "Piotrków Trybunalski", "Pabianice", "Tomaszów Mazowiecki", "Bełchatów", "Zgierz", "Skierniewice", "Radomsko"));
-        voivodeshipToCities.put("Małopolskie", Arrays.asList("Kraków", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów", "Olkusz", "Nowy Targ", "Bochnia"));
-        voivodeshipToCities.put("Mazowieckie", Arrays.asList("Warszawa", "Radom", "Płock", "Siedlce", "Pruszków", "Ostrołęka", "Legionowo", "Ciechanów"));
+        voivodeshipToCities.put("malopolskie", Arrays.asList("krakow", "Tarnów", "Nowy Sącz", "Oświęcim", "Chrzanów", "Olkusz", "Nowy Targ", "Bochnia"));
+        voivodeshipToCities.put("mazowieckie", Arrays.asList("warszawa", "Radom", "Płock", "Siedlce", "Pruszków", "Ostrołęka", "Legionowo", "Ciechanów"));
         voivodeshipToCities.put("Opolskie", Arrays.asList("Opole", "Kędzierzyn-Koźle", "Nysa", "Brzeg", "Kluczbork", "Prudnik", "Strzelce Opolskie", "Głubczyce"));
         voivodeshipToCities.put("Podkarpackie", Arrays.asList("Rzeszów", "Przemyśl", "Stalowa Wola", "Mielec", "Tarnobrzeg", "Krosno", "Sanok", "Jasło"));
         voivodeshipToCities.put("Podlaskie", Arrays.asList("Białystok", "Suwałki", "Łomża", "Augustów", "Bielsk Podlaski", "Zambrów", "Hajnówka", "Siemiatycze"));
@@ -67,26 +68,7 @@ public class MainScreenController {
     @FXML
     private ComboBox<String> sortByComboBox;
 
-    private final ObservableList<ApartmentInfo> apartmentList = FXCollections.observableArrayList();
-    public final ScraperApi scraperApi = new ScraperApi();
 
-    public ScraperApi getScraperApi() {
-        return this.scraperApi;
-    }
-    private final Scraper   scraper = new Scraper(
-            PropertyType.APARTMENTS,
-            PurchaseType.FOR_SALE,
-            CityType.KRAKOW,
-            VoivodeshipType.LESSER_POLAND,
-            Limit.LIMIT_24
-    );
-
-    private final ScraperOlx scraperOlx = new ParserOlx(
-            PropertyType.APARTMENTS_OLX,
-            PurchaseType.FOR_SALE,
-            CityType.KRAKOW,
-            VoivodeshipType.LESSER_POLAND
-    );
 
 
     @FXML
@@ -219,6 +201,30 @@ public class MainScreenController {
         cityCheckComboBox.getItems().setAll(cities);
     }
 
+    private CityType mapCityNameToEnum(String cityName) {
+        String normalizedCityName = normalizeString(cityName);
+        return CityType.valueOfLabel(normalizedCityName);
+    }
+
+    private VoivodeshipType mapVoivodeshipNameToEnum(String voivodeshipName) {
+        String normalizedVoivodeshipName = normalizeString(voivodeshipName);
+        return VoivodeshipType.valueOfLabel(normalizedVoivodeshipName);
+    }
+
+    private String normalizeString(String input) {
+        return input.toLowerCase()
+                .replace(" ", "-")
+                .replace("ą", "a")
+                .replace("ć", "c")
+                .replace("ę", "e")
+                .replace("ł", "l")
+                .replace("ń", "n")
+                .replace("ó", "o")
+                .replace("ś", "s")
+                .replace("ż", "z")
+                .replace("ź", "z");
+    }
+
     @FXML
     protected void handleLoadData() {
         loadDataButton.setDisable(true);
@@ -230,7 +236,30 @@ public class MainScreenController {
         loadDataTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                scraperApi.createApartmentInfoArrayList();
+                // Logowanie do konsoli dla debugowania
+                System.out.println("Zadanie rozpoczęte.");
+
+                List<String> selectedVoivodeshipsNames = voivodeshipCheckComboBox.getCheckModel().getCheckedItems();
+                List<String> selectedCitiesNames = cityCheckComboBox.getCheckModel().getCheckedItems();
+
+                // Logowanie wybranych województw i miast
+                System.out.println("Wybrane województwa: " + selectedVoivodeshipsNames);
+                System.out.println("Wybrane miasta: " + selectedCitiesNames);
+
+                List<VoivodeshipType> selectedVoivodeships = selectedVoivodeshipsNames
+                        .stream()
+                        .map(MainScreenController.this::mapVoivodeshipNameToEnum)
+                        .collect(Collectors.toList());
+                List<CityType> selectedCities = selectedCitiesNames
+                        .stream()
+                        .map(MainScreenController.this::mapCityNameToEnum)
+                        .collect(Collectors.toList());
+
+                // Logowanie przekształconych wartości
+                System.out.println("Przekształcone województwa: " + selectedVoivodeships);
+                System.out.println("Przekształcone miasta: " + selectedCities);
+
+                scraperApi.createApartmentInfoArrayList(selectedCities, selectedVoivodeships, voivodeshipToCities);
                 return null;
             }
         };
@@ -242,17 +271,21 @@ public class MainScreenController {
             apartmentListView.setItems(apartmentList);
             loadDataButton.setDisable(false);
             cancelLoadDataButton.setVisible(false);
+
+            // Logowanie sukcesu
+            System.out.println("Zadanie zakończone sukcesem. Dane załadowane.");
         });
 
         loadDataTask.setOnFailed(e -> {
             logger.error("Error during data loading: ", loadDataTask.getException());
             loadingLabel.setText("Error during data loading.");
-            // Dodatkowa obsługa błędów, np. wyświetlenie komunikatu
+
+            // Logowanie błędu
+            System.out.println("Zadanie zakończone błędem: " + loadDataTask.getException());
         });
 
         new Thread(loadDataTask).start();
     }
-
     @FXML
     protected void handleCancelLoadData() {
         if (loadDataTask != null && loadDataTask.isRunning()) {

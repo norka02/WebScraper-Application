@@ -2,6 +2,9 @@ package pl.hubertmaka.project.enums;
 
 import pl.hubertmaka.project.interfaces.Type;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum VoivodeshipType implements Type {
     LOWER_SILESIA("dolnoslaskie"),
     KUYAVIA_POMERANIA("kujawsko--pomorskie"),
@@ -24,9 +27,20 @@ public enum VoivodeshipType implements Type {
     ALL_OTODOM("cala-polska");
 
     private final String polishName;
+    private static final Map<String, VoivodeshipType> BY_LABEL = new HashMap<>();
 
-    VoivodeshipType(String name) {
-        this.polishName = name;
+    static {
+        for (VoivodeshipType e : values()) {
+            BY_LABEL.put(e.polishName, e);
+        }
+    }
+
+    VoivodeshipType(String polishName) {
+        this.polishName = polishName;
+    }
+
+    public static VoivodeshipType valueOfLabel(String label) {
+        return BY_LABEL.get(label);
     }
 
     @Override

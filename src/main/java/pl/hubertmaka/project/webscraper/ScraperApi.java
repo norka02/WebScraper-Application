@@ -5,6 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
+
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,78 +26,77 @@ public class ScraperApi {
             executorService.shutdownNow();
         }
     }
-    public static void main(String[] args) throws IOException {
-        try {
-            ScraperApi scraperApi = new ScraperApi();
 
-            scraperApi.createApartmentInfoArrayList();
+    private ArrayList<ApartmentInfo> getApartmentInfoFromSite(Parser parser) throws IOException, InterruptedException {
+        logger.info("Getting apartment info from site using Parser: " + parser.getClass().getSimpleName());
+        ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite(5));
+        return createApartmentInfoArrayList(elementsArrayList, parser);
+    }
 
-            System.out.println(scraperApi.apartmentInfoArrayList.toString());
-            for (ApartmentInfo apartmentInfo: scraperApi.apartmentInfoArrayList) {
-                System.out.println(apartmentInfo.getAllInfo());
+    private ArrayList<ApartmentInfo> getApartmentInfoFromSite(ParserOlx parserOlx) throws IOException, InterruptedException {
+        logger.info("Getting apartment info from site using ParserOlx: " + parserOlx.getClass().getSimpleName());
+        ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite(5));
+        return createApartmentInfoArrayList(elementsArrayList, parserOlx);
+    }
+
+    public void createApartmentInfoArrayList(List<CityType> selectedCities, List<VoivodeshipType> selectedVoivodeships, Map<String, List<String>> voivodeshipToCities) throws IOException, InterruptedException, ExecutionException {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ArrayList<Future<ArrayList<ApartmentInfo>>> futures = new ArrayList<>();
+
+        for (VoivodeshipType voivodeship : selectedVoivodeships) {
+            List<String> citiesInVoivodeship = voivodeshipToCities.get(voivodeship.getPolishName());
+            for (CityType city : selectedCities) {
+                if (citiesInVoivodeship != null && citiesInVoivodeship.contains(city.getPolishName())) {
+                    logger.info("Creating parsers for city: " + city + " and voivodeship: " + voivodeship);
+                    Parser parser = createOtodomParser(city, voivodeship);
+                    ParserOlx parserOlx = createOlxParser(city, voivodeship);
+
+                    futures.add(executor.submit(() -> getApartmentInfoFromSite(parser)));
+                    futures.add(executor.submit(() -> getApartmentInfoFromSite(parserOlx)));
+                } else {
+                    logger.warn("City: " + city + " is not in the voivodeship: " + voivodeship + ", skipping...");
+                }
             }
-
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
         }
-    }
 
+        for (Future<ArrayList<ApartmentInfo>> future : futures) {
+            try {
+                apartmentInfoArrayList.addAll(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Error in retrieving apartment info: ", e);
+            }
+        }
 
-
-    public void createApartmentInfoArrayList() throws IOException, InterruptedException, ExecutionException {
-        ExecutorService executor = Executors.newFixedThreadPool(2); // Utwórz pulę wątków z dwoma wątkami
-
-        ParserOlx parserOlx = this.createOlxParser();
-        Parser parser = this.createOtodomParser();
-
-        // Utwórz zadania
-        Future<ArrayList<Elements>> futureOtodom = executor.submit(() -> getElementsFromSite(parser));
-        Future<ArrayList<Elements>> futureOlx = executor.submit(() -> getElementsFromSite(parserOlx));
-
-        // Pobierz wyniki
-        ArrayList<Elements> elementsArrayListOtodom = futureOtodom.get();
-        ArrayList<Elements> elementsArrayListOlx = futureOlx.get();
-
-        // Zamknij ExecutorService
         executor.shutdown();
-
-        ArrayList<ApartmentInfo> apartmentInfoArrayListOtodom = this.createApartmentInfoArrayList(elementsArrayListOtodom, parser);
-        ArrayList<ApartmentInfo> apartmentInfoArrayListOlx = this.createApartmentInfoArrayList(elementsArrayListOlx, parserOlx);
-
-        this.apartmentInfoArrayList.addAll(apartmentInfoArrayListOtodom);
-        this.apartmentInfoArrayList.addAll(apartmentInfoArrayListOlx);
+        logger.info("Scraping completed. Total apartments scraped: " + apartmentInfoArrayList.size());
     }
 
-    private ParserOlx createOlxParser() {
-        // TODO: create builder design pattern
-        return new ParserOlx(
-            PropertyType.APARTMENTS_OLX,
-            PurchaseType.FOR_SALE,
-            CityType.KRAKOW,
-            VoivodeshipType.LESSER_POLAND
-        );
-    }
-
-    private Parser createOtodomParser() {
-        // TODO: create builder design pattern
+    private Parser createOtodomParser(CityType city, VoivodeshipType voivodeship) {
         return new Parser(
                 PropertyType.APARTMENTS,
                 PurchaseType.FOR_SALE,
-                CityType.KRAKOW,
-                VoivodeshipType.LESSER_POLAND,
+                city,
+                voivodeship,
                 Limit.LIMIT_24
+        );
+    }
+
+    private ParserOlx createOlxParser(CityType city, VoivodeshipType voivodeship) {
+        return new ParserOlx(
+                PropertyType.APARTMENTS_OLX,
+                PurchaseType.FOR_SALE,
+                city,
+                voivodeship
         );
     }
 
 
     private ArrayList<Elements> getElementsFromSite(Parser parser) throws IOException, InterruptedException {
-        return new ArrayList<>(parser.getAllElementsFromSite(1));
+        return new ArrayList<>(parser.getAllElementsFromSite(5));
     }
 
     private ArrayList<Elements> getElementsFromSite(ParserOlx parserOlx) throws IOException, InterruptedException {
-        return new ArrayList<>(parserOlx.getAllElementsFromSite(1));
+        return new ArrayList<>(parserOlx.getAllElementsFromSite(5));
     }
 
     private ArrayList<ApartmentInfo> createApartmentInfoArrayList(ArrayList<Elements> elementsArrayList, ParserOlx parserOlx) {
