@@ -1,5 +1,9 @@
 package pl.hubertmaka.project.webscraper;
 
+/**
+    API to all Scraper Classes
+ */
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.HttpStatusException;

@@ -1,6 +1,8 @@
 package pl.hubertmaka.project.webscraper;
 
-// otodom.pl
+/**
+    OTODOM.PL Scraper Class
+ */
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

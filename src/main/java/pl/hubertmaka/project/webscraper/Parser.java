@@ -1,5 +1,9 @@
 package pl.hubertmaka.project.webscraper;
 
+/**
+ OTODOM.PL Parser Class
+ */
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Element;

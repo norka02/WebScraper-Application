@@ -1,5 +1,9 @@
 package pl.hubertmaka.project.webscraper;
 
+/**
+ OLX.PL Scraper Class
+ */
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Connection;
