@@ -24,7 +24,7 @@ public class ScraperApi {
     private ArrayList<ApartmentInfo> getApartmentInfoFromSite(Parser parser) {
         ArrayList<ApartmentInfo> apartmentInfos = new ArrayList<>();
         try {
-            ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite(3)); //CHANGE IF WANT SOFT SEARCHING
+            ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite()); //CHANGE IF WANT SOFT SEARCHING
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parser);
         } catch (UnknownHostException e) {
             logger.warn("Can not resolve URL. No internet connection.");
@@ -43,7 +43,7 @@ public class ScraperApi {
         ArrayList<ApartmentInfo> apartmentInfos = new ArrayList<>();
 
         try {
-            ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite(3)); //CHANGE IF WANT SOFT SEARCHING
+            ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite(25)); //CHANGE IF WANT SOFT SEARCHING
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parserOlx);
         } catch (HttpStatusException | UnknownHostException e) {
             logger.warn("Cant resolve URL. Check Internet connection.");}
@@ -72,7 +72,7 @@ public class ScraperApi {
                         apartmentInfoArrayList.addAll(getApartmentInfoFromSite(parserOlx));
 
                 } else {
-                    logger.warn("City: " + city + " is not in the voivodeship: " + voivodeship + ", skipping...");
+                    logger.info("City: " + city + " is not in the voivodeship: " + voivodeship + ", skipping...");
                 }
             }
         }
