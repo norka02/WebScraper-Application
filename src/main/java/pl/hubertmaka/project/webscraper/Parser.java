@@ -101,7 +101,6 @@ public class Parser extends Scraper {
     private HashMap<String, String> mapLocations(String[] summaryLocationArray) {
         String[] possibleLocations = {"voivodeship", "city", "district", "street"};
         HashMap<String, String> extractedLocations = new HashMap<>();
-        System.out.println(Arrays.toString(summaryLocationArray));
         for (int i = 0; i < possibleLocations.length - 1; i++) {
             try {
                 extractedLocations.put(possibleLocations[i], summaryLocationArray[summaryLocationArray.length - (i + 1)]);

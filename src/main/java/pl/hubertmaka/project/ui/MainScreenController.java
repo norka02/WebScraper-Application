@@ -87,10 +87,16 @@ public class MainScreenController {
                             setGraphic(null);
                         } else {
                             VBox vbox = new VBox(5);
+                            String priceInfo;
+                            String pricePerMeterInfo;
+                            String roomsInfo;
+                            String additionalInfoCheck;
+                            String isBoostedInfo;
+                            String purchaseTypeInfo;
 
                             Text title = new Text("Tytuł ogłoszenia: " + item.getTitle());
                             title.getStyleClass().add("title-text");
-                            String purchaseTypeInfo;
+
                             if (item.getPurchaseType().equals(PurchaseType.ON_RENT.getPolishName())) {
                                 purchaseTypeInfo = "WYNAJEM";
                             } else {
@@ -102,9 +108,7 @@ public class MainScreenController {
                             Text city = new Text("Miasto: " + item.getCity());
                             Text district = new Text("Dzielnica: " + item.getDistrict());
                             Text street = new Text("Ulica: " + item.getStreet());
-                            String priceInfo;
-                            String pricePerMeterInfo;
-                            String roomsInfo;
+
                             if (item.getPrice() < 0) {
                                 priceInfo = "Cenia: Niezdefiniowana";
                             } else {
@@ -124,8 +128,18 @@ public class MainScreenController {
                             Text pricePerMeter = new Text(pricePerMeterInfo);
                             Text rooms = new Text(roomsInfo);
                             Text size = new Text("Rozmiar mieszkania: " + item.getSize().toString() + " m²");
-                            Text isBoosted = new Text("Czy niedawno podbite: " + item.isBoosted());
-                            Text additionalInfo = new Text("Dodatkowe informacje: " + item.getAdditionalInfo());
+                            if (item.isBoosted()) {
+                                isBoostedInfo = "Tak";
+                            } else {
+                                isBoostedInfo = "Nie";
+                            }
+                            Text isBoosted = new Text("Czy niedawno podbite: " + isBoostedInfo);
+                            if (item.getAdditionalInfo().contains("Not defined")) {
+                                additionalInfoCheck = "Brak";
+                            } else {
+                                additionalInfoCheck = item.getAdditionalInfo();
+                            }
+                            Text additionalInfo = new Text("Dodatkowe informacje: " + additionalInfoCheck);
                             additionalInfo.setWrappingWidth(300);
 
                             Hyperlink link = new Hyperlink(item.getLinkToAnnouncement());
@@ -300,7 +314,7 @@ public class MainScreenController {
 
     @FXML
     protected void handleLoadData() {
-
+        scraperApi.apartmentInfoArrayList.clear();
         PurchaseType purchaseType = forSaleRadioButton.isSelected() ? PurchaseType.FOR_SALE : PurchaseType.ON_RENT;
         loadDataButton.setDisable(true);
         loadingLabel.setVisible(true);
@@ -346,6 +360,7 @@ public class MainScreenController {
             loadDataButton.setDisable(false);
             cancelLoadDataButton.setVisible(false);
 
+
         });
 
         loadDataTask.setOnFailed(e -> {
@@ -364,14 +379,13 @@ public class MainScreenController {
             loadDataTask.cancel();
             cancelLoadDataButton.setVisible(false);
             loadDataButton.setDisable(false);
-            loadingLabel.setText("Loading cancelled.");
+            loadingLabel.setText("Pobieranie danych anulowane.");
         }
     }
 
     public void stopRunningTasks() {
         if (loadDataTask != null && loadDataTask.isRunning()) {
             loadDataTask.cancel();
-            // Dodatkowe wywołania, aby zatrzymać inne działające procesy
         }
     }
 
