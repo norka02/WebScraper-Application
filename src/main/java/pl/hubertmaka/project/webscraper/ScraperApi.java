@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
@@ -21,6 +22,8 @@ public class ScraperApi {
         try {
             ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite(1));
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parser);
+        } catch (UnknownHostException e) {
+            logger.warn("Can not resolve URL. No internet connection.");
         } catch (HttpStatusException e) {
             logger.warn("URL does not exist.");
         } catch (InterruptedException e) {
@@ -38,9 +41,9 @@ public class ScraperApi {
         try {
             ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite(1));
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parserOlx);
-        } catch (HttpStatusException e) {
-            logger.warn("URL does not exist.");
-        } catch (IOException e) {
+        } catch (HttpStatusException | UnknownHostException e) {
+            logger.warn("Cant resolve URL. Check Internet connection.");}
+        catch (IOException e) {
             logger.error("IOException in retrieving apartment info: ", e);
         } catch (InterruptedException e) {
             logger.info("Scraping stopped, exiting getApartmentInfoFromSite. " + e.getMessage());

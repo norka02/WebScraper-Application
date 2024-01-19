@@ -4,8 +4,8 @@
 <?import org.controlsfx.control.CheckComboBox?>
 <?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
-
 <?import java.net.URL?>
+
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.hubertmaka.project.ui.MainScreenController">
     <stylesheets>
         <URL value="@styles.css" />
@@ -13,8 +13,8 @@
     <left>
         <ListView fx:id="apartmentListView" styleClass="list-view"/>
     </left>
-    <right>
-        <VBox styleClass="vbox">
+    <center>
+        <VBox styleClass="vbox" spacing="5">
             <Label text="Wybierz województwa:"/>
             <CheckComboBox fx:id="voivodeshipCheckComboBox" />
             <Label text="Wybierz miasta:"/>
@@ -22,14 +22,11 @@
             <Label text="Typ nieruchomości:"/>
             <RadioButton fx:id="forSaleRadioButton" text="Na sprzedaż" toggleGroup="$purchaseTypeGroup" selected="true"/>
             <RadioButton fx:id="forRentRadioButton" text="Na wynajem" toggleGroup="$purchaseTypeGroup"/>
-
             <Button fx:id="loadDataButton" onAction="#handleLoadData" text="Pobierz dane" />
             <Button fx:id="cancelLoadDataButton" onAction="#handleCancelLoadData" text="Anuluj pobieranie" visible="false"/>
-
             <Label text="Filtruj:"/>
             <ComboBox fx:id="filterByCityComboBox" promptText="Wybierz miasto" styleClass="combo-box"/>
             <ComboBox fx:id="filterByDistrictComboBox" promptText="Wybierz dzielnicę" styleClass="combo-box"/>
-
             <Label text="Sortuj:"/>
             <ComboBox fx:id="sortByComboBox" promptText="Sortuj według" styleClass="combo-box">
                 <items>
@@ -49,10 +46,8 @@
                 </items>
             </ComboBox>
             <Button text="Zastosuj filtr i sortowanie" onAction="#handleFilterAndSort"/>
+            <Label fx:id="loadingLabel" text="Ładowanie danych... W zależności od ilości wybranych miast oraz województw może to zająć chwilę. Pójdź sobie zaparzyć herbatę i kiedy wrócisz wszystko powinno być już gotowe do przeglądu ;)" styleClass="text-label" wrapText="true" />
 
-            <Label fx:id="loadingLabel" text="Ładowanie danych... W zależności od ilości wybranych miast oraz województw może to zająć chwilę. Pójdź sobie zaparzyć herbatę i kiedy wrócisz wszystko powinno być już gotowe do przeglądu ;)" wrapText="true" />
-            <Label fx:id="infoLabel" text="Musisz wybrać województwa i miasta aby dostać dane." wrapText="true" visible="false" />
         </VBox>
-    </right>
-
+    </center>
 </BorderPane>

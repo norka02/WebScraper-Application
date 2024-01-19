@@ -4,7 +4,7 @@
 
 .vbox {
     -fx-padding: 15;
-    -fx-spacing: 15;
+    -fx-spacing: 5;
     -fx-alignment: top-left;
 }
 .list-view .list-cell {
@@ -37,7 +37,7 @@
 
 .combo-box .list-cell, .combo-box .cell {
     -fx-wrap-text: true;
-    -fx-pref-width: 150px;
+    -fx-pref-width: 50px;
     -fx-text-fill: black;
 }
 
@@ -48,8 +48,17 @@
     -fx-border-radius: 5;
     -fx-padding: 10 20 10 10;
 }
+.text-label {
+    -fx-max-width: 100px;
+}
 
 .label {
     -fx-font-weight: bold;
     -fx-text-fill: #3e6e79;
 }
+
+.title-text {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+

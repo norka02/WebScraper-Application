@@ -32,7 +32,7 @@ public class Main extends Application {
             primaryStage.show();
 
         } catch (Exception e) {
-            logger.error("Error during booting application: ", e);
+            logger.fatal("Error during booting application: ", e);
         }
     }
 

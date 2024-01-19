@@ -1,6 +1,7 @@
 package pl.hubertmaka.project.ui;
 
 import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import javafx.collections.FXCollections;
@@ -32,11 +33,8 @@ public class MainScreenController {
     private final Map<String, List<String>> normalizedVoivodeshipToCities = new HashMap<>();
     private final ObservableList<ApartmentInfo> apartmentList = FXCollections.observableArrayList();
     public final ScraperApi scraperApi = new ScraperApi();
+    private final ObservableList<ApartmentInfo> allApartments = FXCollections.observableArrayList();
 
-    private ObservableList<ApartmentInfo> filteredList = FXCollections.observableArrayList();
-    private ObservableList<ApartmentInfo> allApartments = FXCollections.observableArrayList();
-    @FXML
-    public Label infoLabel;
     @FXML
     private CheckComboBox<String> voivodeshipCheckComboBox;
     @FXML
@@ -78,10 +76,10 @@ public class MainScreenController {
         forSaleRadioButton.setToggleGroup(purchaseTypeGroup);
         forRentRadioButton.setToggleGroup(purchaseTypeGroup);
         initializeSortOptions();
-        apartmentListView.setCellFactory(new Callback<ListView<ApartmentInfo>, ListCell<ApartmentInfo>>() {
+        apartmentListView.setCellFactory(new Callback<>() {
             @Override
             public ListCell<ApartmentInfo> call(ListView<ApartmentInfo> listView) {
-                return new ListCell<ApartmentInfo>() {
+                return new ListCell<>() {
                     @Override
                     protected void updateItem(ApartmentInfo item, boolean empty) {
                         super.updateItem(item, empty);
@@ -91,6 +89,7 @@ public class MainScreenController {
                             VBox vbox = new VBox(5);
 
                             Text title = new Text("Tytuł ogłoszenia: " + item.getTitle());
+                            title.getStyleClass().add("title-text");
                             String purchaseTypeInfo;
                             if (item.getPurchaseType().equals(PurchaseType.ON_RENT.getPolishName())) {
                                 purchaseTypeInfo = "WYNAJEM";
@@ -109,7 +108,7 @@ public class MainScreenController {
                             if (item.getPrice() < 0) {
                                 priceInfo = "Cenia: Niezdefiniowana";
                             } else {
-                               priceInfo = "Cena: " + item.getPrice().toString() + " zł";
+                                priceInfo = "Cena: " + item.getPrice().toString() + " zł";
                             }
                             if (item.getPricePerMeter() < 0) {
                                 pricePerMeterInfo = "Cena za metr: niezdefiniowana";
@@ -140,7 +139,7 @@ public class MainScreenController {
                                 }
                             });
 
-                            vbox.getChildren().addAll(fromSite, title,purchaseType, voivodeship, city, district, street, price, pricePerMeter, rooms, size,isBoosted, additionalInfo, link);
+                            vbox.getChildren().addAll(fromSite, title, purchaseType, voivodeship, city, district, street, price, pricePerMeter, rooms, size, isBoosted, additionalInfo, link);
                             setGraphic(vbox);
                         }
                     }
@@ -234,20 +233,15 @@ public class MainScreenController {
         }
     }
 
-
     private void initializeVoivodeshipCheckComboBox() {
         voivodeshipCheckComboBox.getItems().addAll(voivodeshipToCities.keySet());
-        voivodeshipCheckComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener.Change<? extends String> c) -> {
-            updateCityCheckComboBox();
-        });
+        voivodeshipCheckComboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener.Change<? extends String> c) -> updateCityCheckComboBox());
     }
 
-    // Inicjalizacja CheckComboBox dla miast
     private void initializeCityCheckComboBox() {
-        cityCheckComboBox.getItems().clear();  // Wyczyść na początku
+        cityCheckComboBox.getItems().clear();
     }
 
-    // Aktualizacja CheckComboBox dla miast na podstawie wybranych województw
     private void updateCityCheckComboBox() {
         List<String> selectedVoivodeships = voivodeshipCheckComboBox.getCheckModel().getCheckedItems();
         List<String> cities = new ArrayList<>();
@@ -285,82 +279,40 @@ public class MainScreenController {
         apartmentListView.setItems(FXCollections.observableArrayList(stream.collect(Collectors.toList())));
     }
 
-
-
-    private void applyFilterAndSort() {
-        Set<String> selectedVoivodeships = new HashSet<>(voivodeshipCheckComboBox.getCheckModel().getCheckedItems());
-        Set<String> selectedCities = new HashSet<>(cityCheckComboBox.getCheckModel().getCheckedItems());
-        String selectedSortOption = sortByComboBox.getValue();
-
-        // Filtrowanie
-        Stream<ApartmentInfo> stream = allApartments.stream()
-                .filter(apartment -> (selectedVoivodeships.isEmpty() || selectedVoivodeships.contains(apartment.getVoivodeship()))
-                        && (selectedCities.isEmpty() || selectedCities.contains(apartment.getCity())));
-
-        // Sortowanie
-        Comparator<ApartmentInfo> comparator = getComparator(selectedSortOption);
-        if (comparator != null) {
-            stream = stream.sorted(comparator);
-        }
-
-        filteredList.setAll(stream.collect(Collectors.toList()));
-        logger.info("Filtrowanie i sortowanie zakończone. Liczba wyników: " + filteredList.size());
-    }
     private Comparator<ApartmentInfo> getComparator(String sortOption) {
         if (sortOption == null || sortOption.equals("Domyślnie")) return null;
-        switch (sortOption) {
-            case "Cena rosnąco":
-                return Comparator.comparing(ApartmentInfo::getPrice);
-            case "Cena malejąco":
-                return Comparator.comparing(ApartmentInfo::getPrice).reversed();
-            case "Cena za metr rosnąco":
-                return Comparator.comparing(ApartmentInfo::getPricePerMeter);
-            case "Cena za metr malejąco":
-                return Comparator.comparing(ApartmentInfo::getPricePerMeter).reversed();
-            case "Rozmiar rosnąco":
-                return Comparator.comparing(ApartmentInfo::getSize);
-            case "Rozmiar malejąco":
-                return Comparator.comparing(ApartmentInfo::getSize).reversed();
-            case "Alfabetycznie dzielnice A-Z":
-                return Comparator.comparing(ApartmentInfo::getDistrict);
-            case "Alfabetycznie dzielnice Z-A":
-                return Comparator.comparing((ApartmentInfo::getDistrict)).reversed();
-            case "Alfabetycznie miasta A-Z":
-                return Comparator.comparing(ApartmentInfo::getCity);
-            case "Alfabetycznie miasta Z-A":
-                return Comparator.comparing((ApartmentInfo::getCity)).reversed();
-            case "Alfabetycznie województwa A-Z":
-                return Comparator.comparing(ApartmentInfo::getVoivodeship);
-            case "Alfabetycznie województwa Z-A":
-                return Comparator.comparing((ApartmentInfo::getVoivodeship)).reversed();
-            default:
-                return null;
-        }
+        return switch (sortOption) {
+            case "Cena rosnąco" -> Comparator.comparing(ApartmentInfo::getPrice);
+            case "Cena malejąco" -> Comparator.comparing(ApartmentInfo::getPrice).reversed();
+            case "Cena za metr rosnąco" -> Comparator.comparing(ApartmentInfo::getPricePerMeter);
+            case "Cena za metr malejąco" -> Comparator.comparing(ApartmentInfo::getPricePerMeter).reversed();
+            case "Rozmiar rosnąco" -> Comparator.comparing(ApartmentInfo::getSize);
+            case "Rozmiar malejąco" -> Comparator.comparing(ApartmentInfo::getSize).reversed();
+            case "Alfabetycznie dzielnice A-Z" -> Comparator.comparing(ApartmentInfo::getDistrict);
+            case "Alfabetycznie dzielnice Z-A" -> Comparator.comparing((ApartmentInfo::getDistrict)).reversed();
+            case "Alfabetycznie miasta A-Z" -> Comparator.comparing(ApartmentInfo::getCity);
+            case "Alfabetycznie miasta Z-A" -> Comparator.comparing((ApartmentInfo::getCity)).reversed();
+            case "Alfabetycznie województwa A-Z" -> Comparator.comparing(ApartmentInfo::getVoivodeship);
+            case "Alfabetycznie województwa Z-A" -> Comparator.comparing((ApartmentInfo::getVoivodeship)).reversed();
+            default -> null;
+        };
     }
 
     @FXML
     protected void handleLoadData() {
 
         PurchaseType purchaseType = forSaleRadioButton.isSelected() ? PurchaseType.FOR_SALE : PurchaseType.ON_RENT;
-        infoLabel.setVisible(false);
         loadDataButton.setDisable(true);
         loadingLabel.setVisible(true);
         cancelLoadDataButton.setVisible(true);
         apartmentListView.setItems(null);
-        loadingLabel.setText("Loading data... It can take some time depends on cities to get. You can go take some tea and when you will return it should be finished ;)");
-
-        loadDataTask = new Task<Void>() {
+        loadingLabel.setText("Ładowanie danych... W zależności od ilości wybranych miast oraz województw może to zająć chwilę. Pójdź sobie zaparzyć herbatę i kiedy wrócisz wszystko powinno być już gotowe do przeglądu ;)");
+        loadDataTask = new Task<>() {
             @Override
-            protected Void call() throws Exception {
-                // Logowanie do konsoli dla debugowania
-                System.out.println("Zadanie rozpoczęte.");
+            protected Void call() {
 
                 List<String> selectedVoivodeshipsNames = voivodeshipCheckComboBox.getCheckModel().getCheckedItems();
                 List<String> selectedCitiesNames = cityCheckComboBox.getCheckModel().getCheckedItems();
-
-                // Logowanie wybranych województw i miast
-                System.out.println("Wybrane województwa: " + selectedVoivodeshipsNames);
-                System.out.println("Wybrane miasta: " + selectedCitiesNames);
 
                 List<VoivodeshipType> selectedVoivodeships = selectedVoivodeshipsNames
                         .stream()
@@ -371,10 +323,6 @@ public class MainScreenController {
                         .map(MainScreenController.this::mapCityNameToEnum)
                         .collect(Collectors.toList());
 
-                // Logowanie przekształconych wartości
-                System.out.println("Przekształcone województwa: " + selectedVoivodeships);
-                System.out.println("Przekształcone miasta: " + selectedCities);
-
                 scraperApi.createApartmentInfoArrayList(selectedCities, selectedVoivodeships, normalizedVoivodeshipToCities, purchaseType);
 
                 return null;
@@ -382,30 +330,30 @@ public class MainScreenController {
         };
 
         loadDataTask.setOnSucceeded(e -> {
-            if (apartmentList.isEmpty()) {
-                infoLabel.setVisible(true);
+            if (scraperApi.apartmentInfoArrayList.isEmpty()) {
+                loadingLabel.setVisible(true);
+                loadingLabel.setText("Sprawdź połączenie z Internetem lub poprawność wybranych opcji");
+            } else {
+                loadingLabel.setVisible(false);
             }
             allApartments.clear();
             allApartments.addAll(scraperApi.apartmentInfoArrayList);
             updateComboBoxes();
             apartmentList.addAll(scraperApi.apartmentInfoArrayList);
-            logger.info("Dane załadowane. Liczba apartamentów: " + allApartments.size());
-            loadingLabel.setVisible(false);
+            logger.info("Loaded apartments number: " + allApartments.size());
+
             apartmentListView.setItems(apartmentList);
             loadDataButton.setDisable(false);
             cancelLoadDataButton.setVisible(false);
 
-            // Logowanie sukcesu
-            System.out.println("Zadanie zakończone sukcesem. Dane załadowane.");
         });
 
         loadDataTask.setOnFailed(e -> {
             scraperApi.apartmentInfoArrayList.clear();
-            logger.error("Error during data loading: ", loadDataTask.getException());
-            loadingLabel.setText("Error during data loading.");
 
-            // Logowanie błędu
-            System.out.println("Zadanie zakończone błędem: " + loadDataTask.getException());
+            logger.error("Error during data loading: ");
+            loadingLabel.setText("Wystąpił błąd podczas ładowania danych.");
+
         });
 
         new Thread(loadDataTask).start();
