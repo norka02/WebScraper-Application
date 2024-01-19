@@ -20,7 +20,7 @@ public class ScraperApi {
     private ArrayList<ApartmentInfo> getApartmentInfoFromSite(Parser parser) {
         ArrayList<ApartmentInfo> apartmentInfos = new ArrayList<>();
         try {
-            ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite(1));
+            ArrayList<Elements> elementsArrayList = new ArrayList<>(parser.getAllElementsFromSite()); //CHANGE IF WANT SOFT SEARCHING
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parser);
         } catch (UnknownHostException e) {
             logger.warn("Can not resolve URL. No internet connection.");
@@ -39,7 +39,7 @@ public class ScraperApi {
         ArrayList<ApartmentInfo> apartmentInfos = new ArrayList<>();
 
         try {
-            ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite(1));
+            ArrayList<Elements> elementsArrayList = new ArrayList<>(parserOlx.getAllElementsFromSite()); //CHANGE IF WANT SOFT SEARCHING
             apartmentInfos = createApartmentInfoArrayList(elementsArrayList, parserOlx);
         } catch (HttpStatusException | UnknownHostException e) {
             logger.warn("Cant resolve URL. Check Internet connection.");}

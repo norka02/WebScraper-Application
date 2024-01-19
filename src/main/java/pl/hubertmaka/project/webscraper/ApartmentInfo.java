@@ -1,8 +1,5 @@
 package pl.hubertmaka.project.webscraper;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class ApartmentInfo {
     private String fromSite = null;
 
@@ -80,9 +77,7 @@ public class ApartmentInfo {
         this.additionalInfo = additionalInfo;
     }
 
-    public String getImgSrc() {
-        return imgSrc;
-    }
+
 
     public void setImgSrc(String imgSrc) {
         this.imgSrc = imgSrc;

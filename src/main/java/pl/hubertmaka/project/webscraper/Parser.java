@@ -7,7 +7,6 @@ import org.jsoup.select.Elements;
 import pl.hubertmaka.project.enums.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -64,10 +63,6 @@ public class Parser extends Scraper {
         }
         logger.warn("Empty element.");
         return "";
-    }
-
-    private Element getAllArticleElement(Element listItem) {
-        return listItem.selectFirst("article");
     }
 
     private boolean getIsBoostedStatus(Element listItem) {

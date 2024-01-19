@@ -30,17 +30,10 @@ public class ScraperOlx {
         this.voivodeshipType = voivodeshipType;
     }
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
     public PurchaseType getPurchaseType() {
         return purchaseType;
     }
 
-    public CityType getCityType() {
-        return cityType;
-    }
 
     public VoivodeshipType getVoivodeshipType() {
         return voivodeshipType;
@@ -69,7 +62,7 @@ public class ScraperOlx {
             page++;
         }
         return elementsArrayList;
-    };
+    }
 
     protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
@@ -90,7 +83,7 @@ public class ScraperOlx {
             page++;
         }
         return elementsArrayList;
-    };
+    }
 
     private Connection connectToSite(String url) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {

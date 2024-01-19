@@ -33,21 +33,10 @@ public class Scraper {
         this.limit = limit;
     }
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
     public PurchaseType getPurchaseType() {
         return purchaseType;
     }
 
-    public CityType getCityType() {
-        return cityType;
-    }
-
-    public VoivodeshipType getVoivodeshipType() {
-        return voivodeshipType;
-    }
 
     protected ArrayList<Elements> getAllElementsFromSite() throws IOException, InterruptedException {
         int page = 1;
@@ -76,7 +65,7 @@ public class Scraper {
             page++;
         }
         return elementsArrayList;
-    };
+    }
 
 
     protected ArrayList<Elements> getAllElementsFromSite(int max_pages) throws IOException, InterruptedException {
@@ -112,7 +101,7 @@ public class Scraper {
             page++;
         }
         return elementsArrayList;
-    };
+    }
 
     private Elements scrapSite(int page) throws IOException, InterruptedException {
         String url = buildUrl(page);
