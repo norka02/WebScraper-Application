@@ -1,7 +1,6 @@
 package pl.hubertmaka.project.ui;
 
 import javafx.collections.ListChangeListener;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import javafx.collections.FXCollections;
@@ -50,8 +49,6 @@ public class MainScreenController {
     @FXML
     private RadioButton forSaleRadioButton;
     @FXML
-    private RadioButton forRentRadioButton;
-    @FXML
     private ToggleGroup purchaseTypeGroup;
     @FXML
     private ComboBox<String> filterByCityComboBox;
@@ -74,7 +71,6 @@ public class MainScreenController {
         initializeVoivodeshipCheckComboBox();
         initializeCityCheckComboBox();
         forSaleRadioButton.setToggleGroup(purchaseTypeGroup);
-        forRentRadioButton.setToggleGroup(purchaseTypeGroup);
         initializeSortOptions();
         apartmentListView.setCellFactory(new Callback<>() {
             @Override
@@ -93,7 +89,6 @@ public class MainScreenController {
                             String additionalInfoCheck;
                             String isBoostedInfo;
                             String purchaseTypeInfo;
-
                             Text title = new Text("Tytuł ogłoszenia: " + item.getTitle());
                             title.getStyleClass().add("title-text");
 
@@ -134,7 +129,7 @@ public class MainScreenController {
                                 isBoostedInfo = "Nie";
                             }
                             Text isBoosted = new Text("Czy niedawno podbite: " + isBoostedInfo);
-                            if (item.getAdditionalInfo().contains("Not defined")) {
+                            if (item.getAdditionalInfo().contains("No additional info")) {
                                 additionalInfoCheck = "Brak";
                             } else {
                                 additionalInfoCheck = item.getAdditionalInfo();
@@ -166,6 +161,9 @@ public class MainScreenController {
     private void updateComboBoxes() {
         Set<String> cities = new HashSet<>();
         Set<String> districts = new HashSet<>();
+
+        cities.add("Wszystkie miasta");
+        districts.add("Wszystkie dzielnice");
 
         for (ApartmentInfo apartment : allApartments) {
             if (apartment.getCity() != null) {
@@ -282,8 +280,8 @@ public class MainScreenController {
         String selectedDistrict = filterByDistrictComboBox.getValue();
 
         Stream<ApartmentInfo> stream = allApartments.stream()
-                .filter(apartment -> (selectedCity == null || apartment.getCity().equals(selectedCity)))
-                .filter(apartment -> (selectedDistrict == null || apartment.getDistrict().equals(selectedDistrict)));
+                .filter(apartment -> (selectedCity == null || apartment.getCity().equals(selectedCity) || selectedCity.equals("Wszystkie miasta")))
+                .filter(apartment -> (selectedDistrict == null || apartment.getDistrict().equals(selectedDistrict) || selectedDistrict.equals("Wszystkie dzielnice")));
 
         Comparator<ApartmentInfo> comparator = getComparator(sortByComboBox.getValue());
         if (comparator != null) {
@@ -315,7 +313,7 @@ public class MainScreenController {
     @FXML
     protected void handleLoadData() {
         scraperApi.apartmentInfoArrayList.clear();
-        PurchaseType purchaseType = forSaleRadioButton.isSelected() ? PurchaseType.FOR_SALE : PurchaseType.ON_RENT;
+        PurchaseType purchaseType =  PurchaseType.FOR_SALE;
         loadDataButton.setDisable(true);
         loadingLabel.setVisible(true);
         cancelLoadDataButton.setVisible(true);
@@ -365,7 +363,8 @@ public class MainScreenController {
 
         loadDataTask.setOnFailed(e -> {
             scraperApi.apartmentInfoArrayList.clear();
-
+            loadDataButton.setDisable(false);
+            cancelLoadDataButton.setVisible(false);
             logger.error("Error during data loading: ");
             loadingLabel.setText("Wystąpił błąd podczas ładowania danych.");
 

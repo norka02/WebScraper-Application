@@ -108,7 +108,7 @@ public class ParserOlx extends ScraperOlx {
         }
 
         for (int i = 0; i < labels.length; i++) {
-            String textValue = sizeAndPricePerMeterArray.get(i).replaceAll("[^\\d.]", "").replace(",", ".");
+            String textValue = sizeAndPricePerMeterArray.get(i).replaceAll("[^\\d.,]", "");
             apartmentInfosHashMap.put(labels[i], textValue);
         }
         return apartmentInfosHashMap;
@@ -116,7 +116,7 @@ public class ParserOlx extends ScraperOlx {
 
     private Integer parsePrice(HashMap<String, String> apartmentInfosHashMap) {
         try {
-            String priceString = apartmentInfosHashMap.get("price");
+            String priceString = apartmentInfosHashMap.get("price").replace(",", ".");
             return Integer.parseInt(priceString);
         } catch (NumberFormatException e) {
             return -1;
@@ -125,7 +125,7 @@ public class ParserOlx extends ScraperOlx {
 
     private Double parsePricePerMeter(HashMap<String, String> apartmentInfosHashMap) {
         try {
-            String pricePerMeter = apartmentInfosHashMap.get("pricePerMeter");
+            String pricePerMeter = apartmentInfosHashMap.get("pricePerMeter").replace(",", ".");
             return Double.parseDouble(pricePerMeter);
         } catch (NumberFormatException e) {
             return -1.0;
@@ -134,7 +134,7 @@ public class ParserOlx extends ScraperOlx {
 
     private Double parseSize(HashMap<String, String> apartmentInfosHashMap) {
         try {
-            String sizeString = apartmentInfosHashMap.get("size");
+            String sizeString = apartmentInfosHashMap.get("size").replace(",", ".");
             return Double.parseDouble(sizeString);
         } catch (NumberFormatException e) {
             return -1.0;

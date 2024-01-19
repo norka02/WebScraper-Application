@@ -21,7 +21,6 @@
             <CheckComboBox fx:id="cityCheckComboBox" />
             <Label text="Typ nieruchomości:"/>
             <RadioButton fx:id="forSaleRadioButton" text="Na sprzedaż" toggleGroup="$purchaseTypeGroup" selected="true"/>
-            <RadioButton fx:id="forRentRadioButton" text="Na wynajem" toggleGroup="$purchaseTypeGroup"/>
             <Button fx:id="loadDataButton" onAction="#handleLoadData" text="Pobierz dane" />
             <Button fx:id="cancelLoadDataButton" onAction="#handleCancelLoadData" text="Anuluj pobieranie" visible="false"/>
             <Label text="Filtruj:"/>
